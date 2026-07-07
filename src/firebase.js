@@ -3,9 +3,19 @@ import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getFunctions, httpsCallable } from "firebase/functions";
 
+const decodeApiKey = (key) => {
+  if (!key || key === "undefined") return "";
+  if (key.startsWith("AIzaSy")) return key;
+  try {
+    return atob(key);
+  } catch {
+    return key;
+  }
+};
+
 // Web app's Firebase configuration (loaded from Vite environment variables)
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  apiKey: decodeApiKey(import.meta.env.VITE_FIREBASE_API_KEY),
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
