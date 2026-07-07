@@ -468,7 +468,7 @@ export const AppStateProvider = ({ children }) => {
       });
       return () => unsubscribe();
     }
-  }, [isFirebaseSupported]);
+  }, []);
 
   useEffect(() => {
     if (currentUser) {

@@ -1,23 +1,18 @@
 import React, { useState } from "react";
 import { useAppState } from "../context/AppStateContext";
 import { 
-  Shield, 
   Database, 
   Radio, 
   Terminal, 
-  AlertOctagon, 
   UserPlus, 
   Edit, 
   Trash2, 
-  Check, 
-  Plus, 
   MapPin, 
   Sliders, 
   BookOpen, 
   Users, 
   UserCheck 
 } from "lucide-react";
-import StatCard from "../components/StatCard";
 
 export default function AdminPanel() {
   const { 
@@ -345,8 +340,9 @@ export default function AdminPanel() {
                 style={{ display: "flex", flexDirection: "column", gap: "10px" }}
               >
                 <div className="input-group" style={{ marginBottom: 0 }}>
-                  <label className="input-label" style={{ marginBottom: "4px" }}>Email Address</label>
+                  <label htmlFor="auth-email-input" className="input-label" style={{ marginBottom: "4px" }}>Email Address</label>
                   <input 
+                    id="auth-email-input"
                     type="email" 
                     className="form-input" 
                     placeholder="name@stadium.com"
@@ -357,8 +353,9 @@ export default function AdminPanel() {
                   />
                 </div>
                 <div className="input-group" style={{ marginBottom: 0 }}>
-                  <label className="input-label" style={{ marginBottom: "4px" }}>Password</label>
+                  <label htmlFor="auth-password-input" className="input-label" style={{ marginBottom: "4px" }}>Password</label>
                   <input 
+                    id="auth-password-input"
                     type="password" 
                     className="form-input" 
                     placeholder="••••••••"
@@ -371,8 +368,9 @@ export default function AdminPanel() {
 
                 {authTab === "signup" && (
                   <div className="input-group" style={{ marginBottom: 0 }}>
-                    <label className="input-label" style={{ marginBottom: "4px" }}>Assigned Account Role</label>
+                    <label htmlFor="auth-role-select" className="input-label" style={{ marginBottom: "4px" }}>Assigned Account Role</label>
                     <select 
+                      id="auth-role-select"
                       className="form-input" 
                       value={authRole} 
                       onChange={(e) => setAuthRole(e.target.value)}
@@ -624,6 +622,7 @@ export default function AdminPanel() {
                           disabled={!isAuthorized}
                           onChange={() => saveFaq({ ...faq, verified: !faq.verified })}
                           style={{ width: "16px", height: "16px", cursor: "pointer" }}
+                          aria-label="Toggle FAQ verification status"
                         />
                       </td>
                       <td>
@@ -633,6 +632,7 @@ export default function AdminPanel() {
                             className="interactive-btn secondary" 
                             style={{ padding: "4px 8px" }}
                             disabled={!isAuthorized}
+                            aria-label={`Edit FAQ for ${faq.keyword}`}
                           >
                             <Edit size={12} />
                           </button>
@@ -641,6 +641,7 @@ export default function AdminPanel() {
                             className="interactive-btn secondary" 
                             style={{ padding: "4px 8px", color: "var(--color-rose)" }}
                             disabled={!isAuthorized}
+                            aria-label={`Delete FAQ for ${faq.keyword}`}
                           >
                             <Trash2 size={12} />
                           </button>
@@ -659,8 +660,9 @@ export default function AdminPanel() {
               </h4>
               <form onSubmit={handleFaqSubmit} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                 <div className="input-group" style={{ marginBottom: 0 }}>
-                  <label className="input-label">Keyword / Intent</label>
+                  <label htmlFor="faq-keyword-input" className="input-label">Keyword / Intent</label>
                   <input 
+                    id="faq-keyword-input"
                     type="text" 
                     className="form-input" 
                     value={faqKeyword} 
@@ -670,8 +672,9 @@ export default function AdminPanel() {
                   />
                 </div>
                 <div className="input-group" style={{ marginBottom: 0 }}>
-                  <label className="input-label">Intent Tag</label>
+                  <label htmlFor="faq-intent-input" className="input-label">Intent Tag</label>
                   <input 
+                    id="faq-intent-input"
                     type="text" 
                     className="form-input" 
                     placeholder="e.g. locate_restroom"
@@ -682,8 +685,9 @@ export default function AdminPanel() {
                   />
                 </div>
                 <div className="input-group" style={{ marginBottom: 0 }}>
-                  <label className="input-label">Synonyms (comma separated)</label>
+                  <label htmlFor="faq-synonyms-input" className="input-label">Synonyms (comma separated)</label>
                   <input 
+                    id="faq-synonyms-input"
                     type="text" 
                     className="form-input" 
                     placeholder="wc, washroom, toilet"
@@ -693,8 +697,9 @@ export default function AdminPanel() {
                   />
                 </div>
                 <div className="input-group" style={{ marginBottom: 0 }}>
-                  <label className="input-label">Response Text</label>
+                  <label htmlFor="faq-response-input" className="input-label">Response Text</label>
                   <textarea 
+                    id="faq-response-input"
                     className="form-input" 
                     rows="3" 
                     value={faqResponse} 
@@ -705,8 +710,9 @@ export default function AdminPanel() {
                 </div>
                 
                 <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-                  <label style={{ fontSize: "0.85rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <label htmlFor="faq-verified-checkbox" style={{ fontSize: "0.85rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}>
                     <input 
+                      id="faq-verified-checkbox"
                       type="checkbox" 
                       checked={faqVerified} 
                       onChange={(e) => setFaqVerified(e.target.checked)} 
@@ -789,8 +795,9 @@ export default function AdminPanel() {
               </h4>
               <form onSubmit={handleGateSubmit} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                 <div className="input-group" style={{ marginBottom: 0 }}>
-                  <label className="input-label">Gate Name</label>
+                  <label htmlFor="gate-name-input" className="input-label">Gate Name</label>
                   <input 
+                    id="gate-name-input"
                     type="text" 
                     className="form-input" 
                     value={gateName} 
@@ -801,8 +808,9 @@ export default function AdminPanel() {
                 </div>
                 <div className="grid-cols-2" style={{ gap: "10px" }}>
                   <div className="input-group" style={{ marginBottom: 0 }}>
-                    <label className="input-label">Current Count</label>
+                    <label htmlFor="gate-count-input" className="input-label">Current Count</label>
                     <input 
+                      id="gate-count-input"
                       type="number" 
                       className="form-input" 
                       value={gateCount} 
@@ -812,8 +820,9 @@ export default function AdminPanel() {
                     />
                   </div>
                   <div className="input-group" style={{ marginBottom: 0 }}>
-                    <label className="input-label">Max Capacity</label>
+                    <label htmlFor="gate-capacity-input" className="input-label">Max Capacity</label>
                     <input 
+                      id="gate-capacity-input"
                       type="number" 
                       className="form-input" 
                       value={gateCapacity} 
@@ -824,8 +833,9 @@ export default function AdminPanel() {
                   </div>
                 </div>
                 <div className="input-group" style={{ marginBottom: 0 }}>
-                  <label className="input-label">Load Status</label>
+                  <label htmlFor="gate-status-select" className="input-label">Load Status</label>
                   <select 
+                    id="gate-status-select"
                     className="form-input" 
                     value={gateStatus} 
                     onChange={(e) => setGateStatus(e.target.value)}
@@ -906,8 +916,9 @@ export default function AdminPanel() {
               </h4>
               <form onSubmit={handleFacilitySubmit} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                 <div className="input-group" style={{ marginBottom: 0 }}>
-                  <label className="input-label">Facility Name</label>
+                  <label htmlFor="facility-name-input" className="input-label">Facility Name</label>
                   <input 
+                    id="facility-name-input"
                     type="text" 
                     className="form-input" 
                     value={facName} 
@@ -917,8 +928,9 @@ export default function AdminPanel() {
                   />
                 </div>
                 <div className="input-group" style={{ marginBottom: 0 }}>
-                  <label className="input-label">Category</label>
+                  <label htmlFor="facility-category-select" className="input-label">Category</label>
                   <select 
+                    id="facility-category-select"
                     className="form-input" 
                     value={facCategory} 
                     onChange={(e) => setFacCategory(e.target.value)}
@@ -931,8 +943,9 @@ export default function AdminPanel() {
                   </select>
                 </div>
                 <div className="input-group" style={{ marginBottom: 0 }}>
-                  <label className="input-label">Description</label>
+                  <label htmlFor="facility-desc-input" className="input-label">Description</label>
                   <textarea 
+                    id="facility-desc-input"
                     className="form-input" 
                     rows="2" 
                     value={facDesc} 
@@ -943,8 +956,9 @@ export default function AdminPanel() {
                 </div>
                 <div className="grid-cols-2" style={{ gap: "10px" }}>
                   <div className="input-group" style={{ marginBottom: 0 }}>
-                    <label className="input-label">Map Position X (0-100%)</label>
+                    <label htmlFor="facility-x-input" className="input-label">Map Position X (0-100%)</label>
                     <input 
+                      id="facility-x-input"
                       type="number" 
                       className="form-input" 
                       min="0" max="100" step="0.1"
@@ -955,8 +969,9 @@ export default function AdminPanel() {
                     />
                   </div>
                   <div className="input-group" style={{ marginBottom: 0 }}>
-                    <label className="input-label">Map Position Y (0-100%)</label>
+                    <label htmlFor="facility-y-input" className="input-label">Map Position Y (0-100%)</label>
                     <input 
+                      id="facility-y-input"
                       type="number" 
                       className="form-input" 
                       min="0" max="100" step="0.1"
@@ -1017,6 +1032,7 @@ export default function AdminPanel() {
                             className="interactive-btn secondary" 
                             style={{ padding: "4px 8px" }}
                             disabled={!isAuthorized}
+                            aria-label={`Edit volunteer ${vol.name}`}
                           >
                             <Edit size={12} />
                           </button>
@@ -1025,6 +1041,7 @@ export default function AdminPanel() {
                             className="interactive-btn secondary" 
                             style={{ padding: "4px 8px", color: "var(--color-rose)" }}
                             disabled={!isAuthorized}
+                            aria-label={`Delete volunteer ${vol.name}`}
                           >
                             <Trash2 size={12} />
                           </button>
@@ -1043,8 +1060,9 @@ export default function AdminPanel() {
               </h4>
               <form onSubmit={handleVolunteerSubmit} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                 <div className="input-group" style={{ marginBottom: 0 }}>
-                  <label className="input-label">Volunteer Name</label>
+                  <label htmlFor="volunteer-name-input" className="input-label">Volunteer Name</label>
                   <input 
+                    id="volunteer-name-input"
                     type="text" 
                     className="form-input" 
                     value={volName} 
@@ -1055,8 +1073,9 @@ export default function AdminPanel() {
                 </div>
                 <div className="grid-cols-2" style={{ gap: "10px" }}>
                   <div className="input-group" style={{ marginBottom: 0 }}>
-                    <label className="input-label">Assigned Zone</label>
+                    <label htmlFor="volunteer-zone-select" className="input-label">Assigned Zone</label>
                     <select 
+                      id="volunteer-zone-select"
                       className="form-input" 
                       value={volZone} 
                       onChange={(e) => setVolZone(e.target.value)}
@@ -1070,8 +1089,9 @@ export default function AdminPanel() {
                     </select>
                   </div>
                   <div className="input-group" style={{ marginBottom: 0 }}>
-                    <label className="input-label">Role</label>
+                    <label htmlFor="volunteer-role-select" className="input-label">Role</label>
                     <select 
+                      id="volunteer-role-select"
                       className="form-input" 
                       value={volRole} 
                       onChange={(e) => setVolRole(e.target.value)}
@@ -1084,8 +1104,9 @@ export default function AdminPanel() {
                   </div>
                 </div>
                 <div className="input-group" style={{ marginBottom: 0 }}>
-                  <label className="input-label">Availability Status</label>
+                  <label htmlFor="volunteer-status-select" className="input-label">Availability Status</label>
                   <select 
+                    id="volunteer-status-select"
                     className="form-input" 
                     value={volStatus} 
                     onChange={(e) => setVolStatus(e.target.value)}
@@ -1096,8 +1117,9 @@ export default function AdminPanel() {
                   </select>
                 </div>
                 <div className="input-group" style={{ marginBottom: 0 }}>
-                  <label className="input-label">Contact Method</label>
+                  <label htmlFor="volunteer-contact-input" className="input-label">Contact Method</label>
                   <input 
+                    id="volunteer-contact-input"
                     type="text" 
                     className="form-input" 
                     placeholder="e.g. Radio Ch 3 / WhatsApp"

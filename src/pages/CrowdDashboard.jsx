@@ -2,9 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useAppState } from "../context/AppStateContext";
 import { generateGateSummaryCallable } from "../firebase";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { ShieldAlert, Users, Flame, Compass, BrainCircuit, Activity, Clock } from "lucide-react";
+import { ShieldAlert, Users, Flame, Compass, BrainCircuit, Loader2 } from "lucide-react";
 import StatCard from "../components/StatCard";
-
 export default function CrowdDashboard() {
   const { 
     gates,
@@ -70,13 +69,13 @@ export default function CrowdDashboard() {
       // Clear summary when counts decrease below the threshold
       setOperationalSummary("");
     }
-  }, [isMultiGateCongestion, gates]);
+  }, [isMultiGateCongestion, gates, congestedGates, addLog, summaryLoading, operationalSummary]);
 
   /**
    * Predefined Rule-Based Alternate Gate Selection (No AI)
    * Finds the best gate with capacity below 80% with the lowest current load
    */
-  const suggestAlternateGate = (congestedGate) => {
+  const suggestAlternateGate = (_congestedGate) => {
     const safeGates = gates.filter(g => (g.currentCount / g.capacity) <= 0.8);
     if (safeGates.length === 0) return "All gates heavily congested. Standard delay queue advisory active.";
     

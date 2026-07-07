@@ -2,16 +2,9 @@ import React, { useState } from "react";
 import { useAppState } from "../context/AppStateContext";
 import { 
   Info, 
-  Clock, 
-  Users, 
-  ShieldAlert, 
-  Sparkles, 
-  Coffee, 
   Navigation, 
-  MapPin, 
   User, 
-  Compass, 
-  Check, 
+  Compass,
   X 
 } from "lucide-react";
 

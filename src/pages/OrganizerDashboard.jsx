@@ -5,10 +5,6 @@ import {
   Calendar, 
   Users, 
   Ticket, 
-  Award, 
-  Settings, 
-  Check, 
-  X, 
   ShieldAlert, 
   BrainCircuit, 
   Clock, 
@@ -22,8 +18,7 @@ export default function OrganizerDashboard() {
   const { 
     userRole, 
     activeEvent, 
-    setActiveEvent, 
-    queues,
+    setActiveEvent,
     gates,
     incidents,
     volunteers,
@@ -154,7 +149,6 @@ export default function OrganizerDashboard() {
 
   // Filter Active Incidents
   const activeIncidents = incidents.filter(i => i.status !== "resolved");
-  const criticalIncidents = activeIncidents.filter(i => i.severity === "Critical" || i.severity === "High");
 
   // Filter Volunteers
   const availableVolunteers = volunteers.filter(v => v.status === "available");

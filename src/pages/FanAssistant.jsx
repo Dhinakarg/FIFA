@@ -2,12 +2,9 @@ import React, { useState } from "react";
 import { useAppState } from "../context/AppStateContext";
 import { askGenieCallable, translateResponseCallable } from "../firebase";
 import { 
-  MessageSquare, 
   AlertTriangle, 
   Send, 
   Sparkles, 
-  HelpCircle, 
-  MapPin, 
   Loader2, 
   Mic, 
   MicOff, 
@@ -17,7 +14,7 @@ import {
 } from "lucide-react";
 
 export default function FanAssistant() {
-  const { reportIncident, queues, faqs, submitFeedback, saveFaq, addLog } = useAppState();
+  const { reportIncident, faqs, submitFeedback, saveFaq, addLog } = useAppState();
   
   // Incident Form States
   const [incTitle, setIncTitle] = useState("");
@@ -78,7 +75,7 @@ export default function FanAssistant() {
    */
   const normalizeQuery = (text) => {
     let norm = text.toLowerCase().trim();
-    norm = norm.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "");
+    norm = norm.replace(/[.,/#!$%^&*;:{}=\-_`~()?]/g, "");
 
     const synonymMap = {
       // Restrooms
@@ -380,8 +377,9 @@ export default function FanAssistant() {
           ) : (
             <form onSubmit={handleIncidentSubmit}>
               <div className="input-group">
-                <label className="input-label">Short Title / Subject</label>
+                <label htmlFor="inc-title-input" className="input-label">Short Title / Subject</label>
                 <input 
+                  id="inc-title-input"
                   type="text" 
                   className="form-input" 
                   placeholder="e.g., Soda Spill Zone D Row 10" 
@@ -393,8 +391,9 @@ export default function FanAssistant() {
 
               <div className="grid-cols-2" style={{ gap: "20px", marginBottom: "20px" }}>
                 <div className="input-group" style={{ marginBottom: 0 }}>
-                  <label className="input-label">Issue Category</label>
+                  <label htmlFor="inc-category-select" className="input-label">Issue Category</label>
                   <select 
+                    id="inc-category-select"
                     className="form-input" 
                     value={incType} 
                     onChange={(e) => setIncType(e.target.value)}
@@ -406,8 +405,9 @@ export default function FanAssistant() {
                   </select>
                 </div>
                 <div className="input-group" style={{ marginBottom: 0 }}>
-                  <label className="input-label">Stadium Location</label>
+                  <label htmlFor="inc-location-select" className="input-label">Stadium Location</label>
                   <select 
+                    id="inc-location-select"
                     className="form-input" 
                     value={incLoc} 
                     onChange={(e) => setIncLoc(e.target.value)}
@@ -424,8 +424,9 @@ export default function FanAssistant() {
               </div>
 
               <div className="input-group">
-                <label className="input-label">Detailed Description</label>
+                <label htmlFor="inc-description-input" className="input-label">Detailed Description</label>
                 <textarea 
+                  id="inc-description-input"
                   className="form-input" 
                   rows="4" 
                   placeholder="Provide precise details (e.g., seat numbers, type of spill, severity) to help staff dispatch teams."
@@ -604,6 +605,7 @@ export default function FanAssistant() {
               onChange={(e) => setUserInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
               disabled={isTyping || isListening}
+              aria-label="Chat input query"
             />
 
             {/* Voice microphone button */}
@@ -619,6 +621,7 @@ export default function FanAssistant() {
               }}
               disabled={isTyping}
               title="Voice Input (Speech to Text)"
+              aria-label="Voice input"
             >
               {isListening ? <MicOff size={18} /> : <Mic size={18} />}
             </button>
@@ -628,6 +631,7 @@ export default function FanAssistant() {
               className="interactive-btn" 
               style={{ padding: "12px" }}
               disabled={isTyping || isListening}
+              aria-label="Send message"
             >
               <Send size={18} />
             </button>
@@ -653,7 +657,7 @@ export default function FanAssistant() {
           <form onSubmit={handleFeedbackSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
             <div style={{ display: "flex", gap: "20px", alignItems: "center", flexWrap: "wrap" }}>
               <div className="input-group" style={{ marginBottom: 0, flexGrow: 1 }}>
-                <label className="input-label">Select Star Rating</label>
+                <span className="input-label" style={{ display: "block", marginBottom: "8px", fontSize: "0.85rem", color: "var(--text-secondary)", fontWeight: 700 }}>Select Star Rating</span>
                 <div style={{ display: "flex", gap: "8px" }}>
                   {[1, 2, 3, 4, 5].map((stars) => (
                     <button
@@ -668,6 +672,7 @@ export default function FanAssistant() {
                         color: fbRating >= stars ? "var(--color-amber)" : "rgba(255,255,255,0.15)",
                         transition: "var(--transition)"
                       }}
+                      aria-label={`Rate ${stars} star${stars > 1 ? 's' : ''}`}
                     >
                       ★
                     </button>
@@ -677,8 +682,9 @@ export default function FanAssistant() {
             </div>
 
             <div className="input-group" style={{ marginBottom: 0 }}>
-              <label className="input-label">Comments / Suggestions</label>
+              <label htmlFor="feedback-comment-input" className="input-label">Comments / Suggestions</label>
               <textarea
+                id="feedback-comment-input"
                 className="form-input"
                 rows="3"
                 placeholder="Share your thoughts (e.g. queue wait times, volunteer friendliness, parking, Wi-Fi)..."

@@ -10,17 +10,9 @@ export default function StatCard({ title, value, icon: Icon, color = "indigo", s
     rose: "var(--color-rose)"
   };
 
-  const glowMap = {
-    cyan: "var(--glow-cyan)",
-    indigo: "var(--glow-indigo)",
-    purple: "var(--glow-purple)",
-    emerald: "var(--glow-emerald)",
-    amber: "var(--glow-amber)",
-    rose: "var(--glow-rose)"
-  };
+
 
   const themeColor = colorMap[color] || colorMap.indigo;
-  const glowShadow = glowMap[color] || glowMap.indigo;
 
   return (
     <div 

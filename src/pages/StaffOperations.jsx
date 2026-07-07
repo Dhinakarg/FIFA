@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useAppState } from "../context/AppStateContext";
 import { generateTacticalDispatchCallable } from "../firebase";
 import { 
@@ -9,7 +9,6 @@ import {
   CheckCircle, 
   Plus, 
   BrainCircuit, 
-  Clock, 
   BookOpen, 
   Loader2 
 } from "lucide-react";
@@ -22,7 +21,6 @@ export default function StaffOperations() {
     updateIncidentStatus, 
     reportIncident,
     tasks, 
-    updateTaskStatus,
     addLog 
   } = useAppState();
 
@@ -74,7 +72,7 @@ export default function StaffOperations() {
   /**
    * Gemini Operational Dispatch Generator
    */
-  const handleGenerateTacticalDispatch = async () => {
+  const handleGenerateTacticalDispatch = useCallback(async () => {
     setReportLoading(true);
     setTacticalReport("");
     addLog("Requesting Gemini Tactical Dispatch analysis from Cloud Function...");
@@ -111,7 +109,7 @@ export default function StaffOperations() {
     } finally {
       setReportLoading(false);
     }
-  };
+  }, [activeIncidents, newDesc, addLog]);
 
   // Auto-trigger Gemini summary on active incidents count change
   useEffect(() => {
@@ -120,7 +118,7 @@ export default function StaffOperations() {
     } else {
       setTacticalReport("");
     }
-  }, [activeIncidents.length]);
+  }, [activeIncidents.length, handleGenerateTacticalDispatch]);
 
   const handleIncidentFormSubmit = (e) => {
     e.preventDefault();
@@ -363,8 +361,9 @@ export default function StaffOperations() {
           ) : (
             <form onSubmit={handleIncidentFormSubmit}>
               <div className="input-group">
-                <label className="input-label">Subject Title</label>
+                <label htmlFor="staff-incident-title-input" className="input-label">Subject Title</label>
                 <input 
+                  id="staff-incident-title-input"
                   type="text" 
                   className="form-input" 
                   placeholder="e.g. Fight in Section 102"
@@ -376,8 +375,9 @@ export default function StaffOperations() {
               </div>
 
               <div className="input-group">
-                <label className="input-label">Incident Type</label>
+                <label htmlFor="staff-incident-type-select" className="input-label">Incident Type</label>
                 <select 
+                  id="staff-incident-type-select"
                   className="form-input" 
                   value={newType} 
                   onChange={(e) => setNewType(e.target.value)}
@@ -393,8 +393,9 @@ export default function StaffOperations() {
 
               <div className="grid-cols-2" style={{ gap: "10px", marginBottom: "16px" }}>
                 <div className="input-group" style={{ marginBottom: 0 }}>
-                  <label className="input-label">Severity</label>
+                  <label htmlFor="staff-incident-severity-select" className="input-label">Severity</label>
                   <select 
+                    id="staff-incident-severity-select"
                     className="form-input" 
                     value={newSeverity} 
                     onChange={(e) => setNewSeverity(e.target.value)}
@@ -406,8 +407,9 @@ export default function StaffOperations() {
                   </select>
                 </div>
                 <div className="input-group" style={{ marginBottom: 0 }}>
-                  <label className="input-label">Location</label>
+                  <label htmlFor="staff-incident-location-select" className="input-label">Location</label>
                   <select 
+                    id="staff-incident-location-select"
                     className="form-input" 
                     value={newLoc} 
                     onChange={(e) => setNewLoc(e.target.value)}
@@ -423,8 +425,9 @@ export default function StaffOperations() {
               </div>
 
               <div className="input-group">
-                <label className="input-label">Description (Enter detailed free text to trigger Gemini)</label>
+                <label htmlFor="staff-incident-desc-textarea" className="input-label">Description (Enter detailed free text to trigger Gemini)</label>
                 <textarea 
+                  id="staff-incident-desc-textarea"
                   className="form-input" 
                   rows="4" 
                   placeholder="Provide precise details of the scene..."

@@ -21,10 +21,7 @@ import {
   Menu,
   X,
   ShieldAlert,
-  Loader2,
-  Users,
-  Compass,
-  CheckCircle
+  Loader2
 } from "lucide-react";
 
 function NavigationWrapper() {
@@ -232,6 +229,7 @@ function NavigationWrapper() {
           <button 
             className="mobile-toggle" 
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle navigation menu"
           >
             {mobileMenuOpen ? <X /> : <Menu />}
           </button>
@@ -458,6 +456,7 @@ function NavigationWrapper() {
                     type="button" 
                     onClick={closeEmergencyModal}
                     style={{ background: "none", border: "none", color: "var(--text-secondary)", cursor: "pointer" }}
+                    aria-label="Close emergency modal"
                   >
                     <X size={18} />
                   </button>
@@ -468,8 +467,9 @@ function NavigationWrapper() {
                 </p>
 
                 <div className="input-group">
-                  <label className="input-label">Emergency Category</label>
+                  <label htmlFor="emergency-category-select" className="input-label">Emergency Category</label>
                   <select 
+                    id="emergency-category-select"
                     className="form-input" 
                     value={emergencyType}
                     onChange={(e) => setEmergencyType(e.target.value)}
@@ -485,8 +485,9 @@ function NavigationWrapper() {
                 </div>
 
                 <div className="input-group">
-                  <label className="input-label">Location / Sector</label>
+                  <label htmlFor="emergency-location-select" className="input-label">Location / Sector</label>
                   <select 
+                    id="emergency-location-select"
                     className="form-input" 
                     value={emergencyLoc}
                     onChange={(e) => setEmergencyLoc(e.target.value)}
@@ -501,8 +502,9 @@ function NavigationWrapper() {
                 </div>
 
                 <div className="input-group">
-                  <label className="input-label">Unstructured Incident Description</label>
+                  <label htmlFor="emergency-description-input" className="input-label">Unstructured Incident Description</label>
                   <textarea 
+                    id="emergency-description-input"
                     className="form-input" 
                     rows="4" 
                     placeholder="Provide details. (If Category is set to Unclear, Gemini will parse keywords like 'smoke', 'heart attack', or 'kid lost' to classify it)."
