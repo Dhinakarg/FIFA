@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { isFirebaseSupported, db } from "../firebase";
+import { isFirebaseSupported, db, auth } from "../firebase";
 import { 
   collection, 
   onSnapshot, 
@@ -7,10 +7,18 @@ import {
   updateDoc, 
   deleteDoc,
   doc, 
+  getDoc,
+  setDoc,
   serverTimestamp, 
   query, 
   orderBy 
 } from "firebase/firestore";
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  signOut, 
+  onAuthStateChanged 
+} from "firebase/auth";
 
 const AppStateContext = createContext();
 
@@ -18,7 +26,8 @@ export const useAppState = () => useContext(AppStateContext);
 
 export const AppStateProvider = ({ children }) => {
   // Global States
-  const [userRole, setUserRole] = useState("admin"); // Default to admin for easier initial developer exploration
+  const [userRole, setUserRole] = useState("admin"); 
+  const [currentUser, setCurrentUser] = useState(null);
   const [evacuationAlarm, setEvacuationAlarm] = useState(false);
   const [activeEvent, setActiveEvent] = useState({
     id: "evt-1",
@@ -433,6 +442,119 @@ export const AppStateProvider = ({ children }) => {
     }
   };
 
+  useEffect(() => {
+    if (isFirebaseSupported && auth) {
+      const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          addLog(`Firebase Auth: User authenticated (${user.email})`);
+          try {
+            const userDocRef = doc(db, "users", user.uid);
+            const userDoc = await getDoc(userDocRef);
+            let role = "staff"; // default role is staff
+            if (userDoc.exists()) {
+              role = userDoc.data().role || "staff";
+            } else {
+              await setDoc(userDocRef, { email: user.email, role });
+              addLog(`Created user profile doc in Firestore users collection.`);
+            }
+            setCurrentUser({ uid: user.uid, email: user.email, role });
+          } catch (err) {
+            console.error("Firestore user doc fetch error:", err);
+            setCurrentUser({ uid: user.uid, email: user.email, role: "staff" });
+          }
+        } else {
+          setCurrentUser(null);
+        }
+      });
+      return () => unsubscribe();
+    }
+  }, [isFirebaseSupported]);
+
+  useEffect(() => {
+    if (currentUser) {
+      setUserRole(currentUser.role);
+    } else {
+      setUserRole("fan"); // Default to fan if signed out
+    }
+  }, [currentUser]);
+
+  const loginWithEmail = async (email, password) => {
+    addLog(`Attempting auth login for: ${email}`);
+    if (isFirebaseSupported && auth) {
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        addLog("Firebase Auth Login successful.");
+      } catch (err) {
+        addLog(`Firebase Auth Login failed: ${err.message}`);
+        throw err;
+      }
+    } else {
+      // Local simulated login fallback
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          let simulatedRole = "staff";
+          if (email.includes("admin")) simulatedRole = "admin";
+          else if (email.includes("organizer")) simulatedRole = "organizer";
+          else if (email.includes("fan")) simulatedRole = "fan";
+          
+          setCurrentUser({
+            uid: `mock-user-${Date.now()}`,
+            email: email,
+            role: simulatedRole
+          });
+          addLog(`Simulated Login successful as role: ${simulatedRole.toUpperCase()}`);
+          resolve();
+        }, 1000);
+      });
+    }
+  };
+
+  const registerWithEmail = async (email, password, role = "staff") => {
+    addLog(`Attempting auth registration for: ${email}`);
+    if (isFirebaseSupported && auth) {
+      try {
+        const credential = await createUserWithEmailAndPassword(auth, email, password);
+        await setDoc(doc(db, "users", credential.user.uid), {
+          email,
+          role,
+          createdAt: new Date().toISOString()
+        });
+        addLog(`Firebase Auth Registration successful with role: ${role}`);
+      } catch (err) {
+        addLog(`Firebase Auth Registration failed: ${err.message}`);
+        throw err;
+      }
+    } else {
+      // Local simulated registration fallback
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          setCurrentUser({
+            uid: `mock-user-${Date.now()}`,
+            email: email,
+            role: role
+          });
+          addLog(`Simulated Registration successful with role: ${role.toUpperCase()}`);
+          resolve();
+        }, 1000);
+      });
+    }
+  };
+
+  const logout = async () => {
+    addLog("Logging out authenticated session...");
+    if (isFirebaseSupported && auth) {
+      try {
+        await signOut(auth);
+        addLog("Firebase Auth Logged out successfully.");
+      } catch (err) {
+        console.error("Firebase Auth Logout error:", err);
+      }
+    } else {
+      setCurrentUser(null);
+      addLog("Simulated Session cleared.");
+    }
+  };
+
   const triggerEvacuationAlarm = (isActive) => {
     setEvacuationAlarm(isActive);
     if (isActive) {
@@ -830,6 +952,10 @@ export const AppStateProvider = ({ children }) => {
         saveVolunteer,
         deleteVolunteer,
         triggerDemoScenario,
+        currentUser,
+        loginWithEmail,
+        registerWithEmail,
+        logout,
         systemLogs,
         addLog,
         seedTestData,

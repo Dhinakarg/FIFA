@@ -38,10 +38,23 @@ export default function AdminPanel() {
     volunteers,
     saveVolunteer,
     deleteVolunteer,
+    currentUser,
+    loginWithEmail,
+    registerWithEmail,
+    logout,
     isFirebaseActive 
   } = useAppState();
 
   const [activeTab, setActiveTab] = useState("faqs");
+
+  // Auth Form State
+  const [authTab, setAuthTab] = useState("signin");
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [authRole, setAuthRole] = useState("staff");
+  const [authError, setAuthError] = useState("");
+  const [authSuccess, setAuthSuccess] = useState("");
+  const [authLoading, setAuthLoading] = useState(false);
 
   // FAQ Form State
   const [editingFaq, setEditingFaq] = useState(null);
@@ -233,15 +246,179 @@ export default function AdminPanel() {
         </div>
       )}
 
-      <div className="grid-cols-3" style={{ gap: "30px", marginBottom: "30px" }}>
+      <div className="grid-cols-2" style={{ gap: "30px", marginBottom: "30px" }}>
+        {/* Firebase Authentication Card */}
+        <div className="glass-panel" style={{ padding: "24px" }}>
+          <h3 style={{ fontSize: "1.2rem", marginBottom: "16px", color: "var(--color-cyan)", display: "flex", alignItems: "center", gap: "8px" }}>
+            <UserCheck size={18} />
+            Firebase Account Authentication
+          </h3>
+
+          {currentUser ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              <div style={{ background: "rgba(16, 185, 129, 0.05)", border: "1px solid rgba(16, 185, 129, 0.2)", padding: "12px", borderRadius: "8px", fontSize: "0.85rem" }}>
+                <span style={{ color: "var(--color-emerald)", fontWeight: 700, display: "block", marginBottom: "4px" }}>
+                  ● Authenticated Account
+                </span>
+                <div style={{ display: "flex", justifyContent: "space-between", margin: "4px 0" }}>
+                  <span style={{ color: "var(--text-muted)" }}>Email:</span>
+                  <span style={{ fontWeight: 600 }}>{currentUser.email}</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", margin: "4px 0" }}>
+                  <span style={{ color: "var(--text-muted)" }}>Account Role:</span>
+                  <span style={{ fontWeight: 600, textTransform: "capitalize" }}>{currentUser.role}</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", margin: "4px 0" }}>
+                  <span style={{ color: "var(--text-muted)" }}>UID:</span>
+                  <span style={{ fontSize: "0.75rem", fontFamily: "monospace" }}>{currentUser.uid.slice(0, 10)}...</span>
+                </div>
+              </div>
+              <button 
+                onClick={async () => {
+                  await logout();
+                  setAuthSuccess("Logged out successfully.");
+                  setTimeout(() => setAuthSuccess(""), 3000);
+                }} 
+                className="interactive-btn danger" 
+                style={{ width: "100%", padding: "10px" }}
+              >
+                Sign Out Session
+              </button>
+            </div>
+          ) : (
+            <div>
+              <div style={{ display: "flex", gap: "10px", borderBottom: "1px solid var(--border-glass)", paddingBottom: "10px", marginBottom: "14px" }}>
+                <button 
+                  onClick={() => { setAuthTab("signin"); setAuthError(""); }}
+                  className="interactive-btn secondary"
+                  style={{
+                    flexGrow: 1,
+                    padding: "6px 12px",
+                    fontSize: "0.75rem",
+                    borderRadius: "6px",
+                    background: authTab === "signin" ? "rgba(6, 182, 212, 0.15)" : "transparent",
+                    borderColor: authTab === "signin" ? "var(--color-cyan)" : "transparent",
+                    color: authTab === "signin" ? "var(--color-cyan)" : "var(--text-secondary)"
+                  }}
+                >
+                  Sign In
+                </button>
+                <button 
+                  onClick={() => { setAuthTab("signup"); setAuthError(""); }}
+                  className="interactive-btn secondary"
+                  style={{
+                    flexGrow: 1,
+                    padding: "6px 12px",
+                    fontSize: "0.75rem",
+                    borderRadius: "6px",
+                    background: authTab === "signup" ? "rgba(6, 182, 212, 0.15)" : "transparent",
+                    borderColor: authTab === "signup" ? "var(--color-cyan)" : "transparent",
+                    color: authTab === "signup" ? "var(--color-cyan)" : "var(--text-secondary)"
+                  }}
+                >
+                  Register
+                </button>
+              </div>
+
+              <form 
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  setAuthError("");
+                  setAuthSuccess("");
+                  setAuthLoading(true);
+                  try {
+                    if (authTab === "signin") {
+                      await loginWithEmail(authEmail, authPassword);
+                      setAuthSuccess("Sign in successful!");
+                    } else {
+                      await registerWithEmail(authEmail, authPassword, authRole);
+                      setAuthSuccess("Registration successful!");
+                    }
+                    setAuthEmail("");
+                    setAuthPassword("");
+                  } catch (err) {
+                    setAuthError(err.message || "Authentication failed. Check credentials.");
+                  } finally {
+                    setAuthLoading(false);
+                  }
+                }}
+                style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+              >
+                <div className="input-group" style={{ marginBottom: 0 }}>
+                  <label className="input-label" style={{ marginBottom: "4px" }}>Email Address</label>
+                  <input 
+                    type="email" 
+                    className="form-input" 
+                    placeholder="name@stadium.com"
+                    value={authEmail} 
+                    onChange={(e) => setAuthEmail(e.target.value)} 
+                    required 
+                    style={{ padding: "8px 12px" }}
+                  />
+                </div>
+                <div className="input-group" style={{ marginBottom: 0 }}>
+                  <label className="input-label" style={{ marginBottom: "4px" }}>Password</label>
+                  <input 
+                    type="password" 
+                    className="form-input" 
+                    placeholder="••••••••"
+                    value={authPassword} 
+                    onChange={(e) => setAuthPassword(e.target.value)} 
+                    required 
+                    style={{ padding: "8px 12px" }}
+                  />
+                </div>
+
+                {authTab === "signup" && (
+                  <div className="input-group" style={{ marginBottom: 0 }}>
+                    <label className="input-label" style={{ marginBottom: "4px" }}>Assigned Account Role</label>
+                    <select 
+                      className="form-input" 
+                      value={authRole} 
+                      onChange={(e) => setAuthRole(e.target.value)}
+                      style={{ padding: "8px 12px" }}
+                    >
+                      <option value="fan">Fan (Read Only)</option>
+                      <option value="staff">Staff (Incident Dispatcher)</option>
+                      <option value="organizer">Organizer (Event Console)</option>
+                      <option value="admin">Administrator (Full Access)</option>
+                    </select>
+                  </div>
+                )}
+
+                {authError && (
+                  <span style={{ fontSize: "0.75rem", color: "var(--color-rose)", marginTop: "4px" }}>
+                    ❌ {authError}
+                  </span>
+                )}
+
+                {authSuccess && (
+                  <span style={{ fontSize: "0.75rem", color: "var(--color-emerald)", marginTop: "4px" }}>
+                    ✅ {authSuccess}
+                  </span>
+                )}
+
+                <button 
+                  type="submit" 
+                  className="interactive-btn" 
+                  disabled={authLoading}
+                  style={{ width: "100%", padding: "10px", marginTop: "6px" }}
+                >
+                  {authLoading ? "Verifying..." : authTab === "signin" ? "Sign In" : "Register Profile"}
+                </button>
+              </form>
+            </div>
+          )}
+        </div>
+
         {/* User Role Simulation */}
         <div className="glass-panel" style={{ padding: "24px" }}>
           <h3 style={{ fontSize: "1.2rem", marginBottom: "16px", color: "var(--color-cyan)", display: "flex", alignItems: "center", gap: "8px" }}>
             <Radio size={18} />
-            Simulate User Roles
+            Simulate User Roles (Overrider)
           </h3>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginBottom: "20px" }}>
-            Swap roles dynamically to test conditional components access rules:
+            Swap active session scopes on-the-fly to test conditional panel overlays:
           </p>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
@@ -255,7 +432,7 @@ export default function AdminPanel() {
                   gap: "12px", 
                   padding: "12px 16px", 
                   cursor: "pointer",
-                  background: userRole === role ? "rgba(6, 182, 212, 0.1)" : "rgba(255, 255, 255, 0.01)",
+                  background: userRole === role ? "rgba(37, 99, 235, 0.1)" : "rgba(255, 255, 255, 0.01)",
                   borderColor: userRole === role ? "var(--color-cyan)" : "var(--border-glass)"
                 }}
               >
@@ -280,7 +457,9 @@ export default function AdminPanel() {
             ))}
           </div>
         </div>
+      </div>
 
+      <div className="grid-cols-2" style={{ gap: "30px", marginBottom: "30px" }}>
         {/* Database Simulation Panel */}
         <div className="glass-panel" style={{ padding: "24px" }}>
           <h3 style={{ fontSize: "1.2rem", marginBottom: "16px", color: "var(--color-purple)", display: "flex", alignItems: "center", gap: "8px" }}>
