@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useAppState } from "../context/AppStateContext";
 import { generateTacticalDispatchCallable } from "../firebase";
 import { 
@@ -37,8 +37,8 @@ export default function StaffOperations() {
   const [reportLoading, setReportLoading] = useState(false);
 
   // Active Incidents lists
-  const activeIncidents = incidents.filter(inc => inc.status !== "resolved");
-  const completedIncidentsCount = incidents.filter(inc => inc.status === "resolved").length;
+  const activeIncidents = useMemo(() => incidents.filter(inc => inc.status !== "resolved"), [incidents]);
+  const completedIncidentsCount = useMemo(() => incidents.filter(inc => inc.status === "resolved").length, [incidents]);
 
   // Predefined SOP Rules (Purely data-based, no AI)
   const predefinedSOPs = {
@@ -111,14 +111,19 @@ export default function StaffOperations() {
     }
   }, [activeIncidents, newDesc, addLog]);
 
+  const dispatchRef = useRef(handleGenerateTacticalDispatch);
+  useEffect(() => {
+    dispatchRef.current = handleGenerateTacticalDispatch;
+  }, [handleGenerateTacticalDispatch]);
+
   // Auto-trigger Gemini summary on active incidents count change
   useEffect(() => {
     if (activeIncidents.length >= 2) {
-      handleGenerateTacticalDispatch();
+      dispatchRef.current();
     } else {
       setTacticalReport("");
     }
-  }, [activeIncidents.length, handleGenerateTacticalDispatch]);
+  }, [activeIncidents.length]);
 
   const handleIncidentFormSubmit = (e) => {
     e.preventDefault();
