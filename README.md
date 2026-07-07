@@ -3,7 +3,6 @@
 StadiumAssist is a premium, real-time Single Page Application (SPA) designed to handle stadium crowd telemetry, safety coordination, and operations briefings. It connects to **Google Firebase** (Firestore database, Auth, and Functions) with a robust offline **Local Simulation Mode** fallback. It also integrates **Gemini AI** for decision-support briefings, FAQ verification, and emergency classification.
 
 Live Demo:
-- **Firebase Hosting (Root path)**: [https://carbon-footprint-awarene-542a4.web.app](https://carbon-footprint-awarene-542a4.web.app)
 - **GitHub Pages (Subfolder path)**: [https://dhinakarg.github.io/FIFA/](https://dhinakarg.github.io/FIFA/)
 
 ---
@@ -48,11 +47,11 @@ Live Demo:
    Create a `.env` file in the root directory and add the following config keys:
    ```env
    VITE_FIREBASE_API_KEY="<YOUR_BASE64_ENCODED_API_KEY>"
-   VITE_FIREBASE_AUTH_DOMAIN="carbon-footprint-awarene-542a4.firebaseapp.com"
-   VITE_FIREBASE_PROJECT_ID="carbon-footprint-awarene-542a4"
-   VITE_FIREBASE_STORAGE_BUCKET="carbon-footprint-awarene-542a4.firebasestorage.app"
-   VITE_FIREBASE_MESSAGING_SENDER_ID="915212873605"
-   VITE_FIREBASE_APP_ID="1:915212873605:web:46f70f873f6d91ea441eec"
+   VITE_FIREBASE_AUTH_DOMAIN="<YOUR_FIREBASE_AUTH_DOMAIN>"
+   VITE_FIREBASE_PROJECT_ID="<YOUR_FIREBASE_PROJECT_ID>"
+   VITE_FIREBASE_STORAGE_BUCKET="<YOUR_FIREBASE_STORAGE_BUCKET>"
+   VITE_FIREBASE_MESSAGING_SENDER_ID="<YOUR_FIREBASE_MESSAGING_SENDER_ID>"
+   VITE_FIREBASE_APP_ID="<YOUR_FIREBASE_APP_ID>"
    ```
 
 4. **Run local development server**:
@@ -78,10 +77,6 @@ The app compiles into a universal relative bundle (`./` base path), making it co
 - **Build client bundle**:
   ```bash
   npm run build
-  ```
-- **Deploy to Firebase Hosting**:
-  ```bash
-  npx firebase deploy --only hosting
   ```
 - **Deploy to GitHub Pages**:
   ```bash
