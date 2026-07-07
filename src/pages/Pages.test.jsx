@@ -1,6 +1,5 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
-import { describe, it, expect, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { AppStateProvider } from '../context/AppStateContext'
 import Home from './Home'
@@ -11,7 +10,7 @@ import OrganizerDashboard from './OrganizerDashboard'
 import AdminPanel from './AdminPanel'
 
 // Mock Firebase SDKs
-vi.mock('../firebase', () => ({
+jest.mock('../firebase', () => ({
   isFirebaseSupported: false,
   db: null,
   auth: null,
@@ -25,14 +24,18 @@ vi.mock('../firebase', () => ({
   summarizeFeedbackCallable: null
 }))
 
-// Mock Recharts ResponsiveContainer for JSDom compatibility
-vi.mock('recharts', async () => {
-  const original = await vi.importActual('recharts')
+// Mock Recharts for JSDom compatibility in Jest
+jest.mock('recharts', () => {
   return {
-    ...original,
-    ResponsiveContainer: ({ children }) => <div data-testid="responsive-container">{children}</div>
-  }
-})
+    ResponsiveContainer: ({ children }) => <div data-testid="responsive-container">{children}</div>,
+    AreaChart: ({ children }) => <div data-testid="area-chart">{children}</div>,
+    Area: () => <div />,
+    XAxis: () => <div />,
+    YAxis: () => <div />,
+    CartesianGrid: () => <div />,
+    Tooltip: () => <div />
+  };
+});
 
 describe('Pages Rendering Tests', () => {
   const renderWithProviders = (component) => {

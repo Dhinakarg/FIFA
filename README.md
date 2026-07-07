@@ -82,3 +82,26 @@ The app compiles into a universal relative bundle (`./` base path), making it co
   ```bash
   npm run deploy
   ```
+
+---
+
+## 🧪 Testing Strategy
+
+Our testing strategy leverages **Jest** and **React Testing Library** to establish high-confidence coverage across all layers of our Single Page Application.
+
+### 1. Test Architecture & Configuration
+- **Test Runner**: Jest configures `jest-environment-jsdom` to run tests inside a mocked browser DOM.
+- **Transpilation**: Babel (`babel.config.cjs`) transpiles ES Modules and JSX elements into CommonJS for Jest execution.
+- **Globals & DOM Matchers**: `jest.setup.js` loads `@testing-library/jest-dom` for native-feeling UI assertions (e.g. `toBeInTheDocument`, `toBeDisabled`).
+
+### 2. Mocking Strategy
+- **Firebase Core SDK**: `src/firebase.js` is mocked globally (`jest.mock('../firebase')`) to default to `isFirebaseSupported: false` during tests. This intercepts all Firestore database connects and auth scripts to force local simulation mode.
+- **Gemini API & Cloud Functions**: All callable functions (`askGenieCallable`, `generateGateSummaryCallable`, etc.) are mocked to verify fallback paths under network timeout or API offline errors.
+- **Charts & Viewports**: Heavy layout packages (`recharts`) are mocked to return simple layout containers to avoid errors related to SVG viewport calculations in JSDom.
+
+### 3. Tested Core Logic Blocks
+- **Knowledge-Base Fallback (askGenie)**: Validates that when the Gemini AI Cloud Function fails, the chatbot falls back to loose keyword matching on verified FAQs, and falls back to generic Help Hub notices if no matches occur.
+- **SVG Pathfinding (getPathDAttribute)**: Validates the trigonometric Bezier coordinate generation formula, ensuring it draws smooth, curve egress paths around the inner stadium bowl.
+- **Gate Congestion Engine (suggestAlternateGate)**: Validates that when a gate exceeds the critical 80% occupancy limit, the rule engine sorts and recommends the safest gate with the lowest load ratio.
+- **RBAC Role Gating**: Asserts that active user roles dynamically gate administrative panels, showing read-only warnings and blocking CRUD forms for regular fans, while enabling all controls for admins.
+
