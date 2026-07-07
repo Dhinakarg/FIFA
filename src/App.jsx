@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom";
+import { HashRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom";
 import { AppStateProvider, useAppState } from "./context/AppStateContext";
 import { classifyEmergencyCallable } from "./firebase";
 import Home from "./pages/Home";
