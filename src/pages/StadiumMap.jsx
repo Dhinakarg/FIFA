@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useAppState } from "../context/AppStateContext";
 import { 
   Info, 
@@ -47,15 +47,15 @@ export default function StadiumMap() {
     "fac-10": "Zone A" // Customer Help Hub Center
   };
 
-  const getActiveFacility = () => {
+  const activeFac = useMemo(() => {
     return facilities.find(f => f.id === selectedFacility);
-  };
-
-  const activeFac = getActiveFacility();
+  }, [facilities, selectedFacility]);
 
   // Filter volunteers in the selected facility's zone
   const activeZone = facilityZones[selectedFacility] || "Zone A";
-  const localVolunteers = volunteers.filter(v => v.zone === activeZone);
+  const localVolunteers = useMemo(() => {
+    return volunteers.filter(v => v.zone === activeZone);
+  }, [volunteers, activeZone]);
 
   // Translate percentage coordinates to absolute SVG dimensions (viewBox 0 0 600 400)
   const getSvgCoords = (fac) => {

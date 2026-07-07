@@ -125,9 +125,9 @@ export const AppStateProvider = ({ children }) => {
   ]);
 
   const [faqs, setFaqs] = useState([
-    { keyword: "gates open", intent: "gates_schedule", synonyms: ["opening time", "enter"], response: "Stadium gates open 2 hours prior to the event kick-off time. VIP gates open 2.5 hours early.", language: "en", source: "manual", verified: true },
-    { keyword: "toilets", intent: "locate_restroom", synonyms: ["restrooms", "bathrooms", "washrooms", "wc"], response: "Restrooms are located in the concourse near Sections 104, 118, 202, and 228.", language: "en", source: "manual", verified: true },
-    { keyword: "food concession", intent: "locate_food", synonyms: ["buy food", "where to eat", "concessions", "drinks"], response: "Eastern Grill, Arena Snacks, and Southern Pizza Hub are open. Check the concessions list on the Map view.", language: "en", source: "manual", verified: true }
+    { id: "faq-1", keyword: "gates open", intent: "gates_schedule", synonyms: ["opening time", "enter"], response: "Stadium gates open 2 hours prior to the event kick-off time. VIP gates open 2.5 hours early.", language: "en", source: "manual", verified: true },
+    { id: "faq-2", keyword: "toilets", intent: "locate_restroom", synonyms: ["restrooms", "bathrooms", "washrooms", "wc"], response: "Restrooms are located in the concourse near Sections 104, 118, 202, and 228.", language: "en", source: "manual", verified: true },
+    { id: "faq-3", keyword: "food concession", intent: "locate_food", synonyms: ["buy food", "where to eat", "concessions", "drinks"], response: "Eastern Grill, Arena Snacks, and Southern Pizza Hub are open. Check the concessions list on the Map view.", language: "en", source: "manual", verified: true }
   ]);
 
   const [facilities, setFacilities] = useState([

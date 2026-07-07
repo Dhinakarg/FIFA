@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useAppState } from "../context/AppStateContext";
 import { generateGateSummaryCallable } from "../firebase";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
@@ -28,8 +28,8 @@ export default function CrowdDashboard() {
   ];
 
   // Count how many gates exceed 80% capacity
-  const congestedGates = gates.filter(g => (g.currentCount / g.capacity) > 0.8);
-  const isMultiGateCongestion = congestedGates.length >= 2;
+  const congestedGates = useMemo(() => gates.filter(g => (g.currentCount / g.capacity) > 0.8), [gates]);
+  const isMultiGateCongestion = useMemo(() => congestedGates.length >= 2, [congestedGates]);
 
   /**
    * Gemini Operational Summary Trigger

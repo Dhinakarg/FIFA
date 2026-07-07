@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useAppState } from "../context/AppStateContext";
 import { generateStadiumReportCallable, summarizeFeedbackCallable } from "../firebase";
 import { 
@@ -148,10 +148,10 @@ export default function OrganizerDashboard() {
   const revenue = Math.round(activeEvent.attendance * 75 + activeEvent.attendance * 0.05 * 250); // General + VIP revenue
 
   // Filter Active Incidents
-  const activeIncidents = incidents.filter(i => i.status !== "resolved");
+  const activeIncidents = useMemo(() => incidents.filter(i => i.status !== "resolved"), [incidents]);
 
   // Filter Volunteers
-  const availableVolunteers = volunteers.filter(v => v.status === "available");
+  const availableVolunteers = useMemo(() => volunteers.filter(v => v.status === "available"), [volunteers]);
 
   // Ingress Flow Rate calculation
   const ingressFlowRate = evacuationAlarm ? "0 p/m" : "245 p/min";
