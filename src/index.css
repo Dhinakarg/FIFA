@@ -29,9 +29,44 @@
   --font-body: 'Inter', sans-serif;
   
   --sidebar-width: 260px;
+  --current-sidebar-width: var(--sidebar-width);
+  --sidebar-bg: #2563eb;
+  --top-navbar-bg: #2563eb;
+  --sidebar-border: rgba(255, 255, 255, 0.15);
   --header-height: 70px;
   --border-radius: 12px; /* Radius: 12px */
   --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark Theme Variables Override */
+[data-theme="dark"] {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #0f172a;
+  --bg-glass: #1e293b;
+  --border-glass: #334155;
+  
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  
+  --color-cyan: #3b82f6;
+  --color-indigo: #6366f1;
+  --color-purple: #a855f7;
+  --color-emerald: #10b981;
+  --color-amber: #f59e0b;
+  --color-rose: #ef4444;
+  
+  --glow-cyan: 0 4px 20px rgba(59, 130, 246, 0.15);
+  --glow-indigo: 0 4px 20px rgba(99, 102, 241, 0.15);
+  --glow-purple: 0 4px 20px rgba(168, 85, 247, 0.15);
+  --glow-emerald: 0 4px 20px rgba(16, 185, 129, 0.15);
+  --glow-amber: 0 4px 20px rgba(245, 158, 11, 0.15);
+  --glow-rose: 0 4px 20px rgba(239, 68, 68, 0.15);
+  
+  --sidebar-bg: #1e293b;
+  --top-navbar-bg: #1e293b;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
 }
 
 * {
@@ -79,7 +114,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .main-content {
   flex-grow: 1;
-  margin-left: var(--sidebar-width);
+  margin-left: var(--current-sidebar-width);
   padding: 40px;
   padding-top: calc(var(--header-height) + 20px);
   min-height: 100vh;
@@ -134,11 +169,11 @@ h1, h2, h3, h4, h5, h6 {
 .top-navbar {
   position: fixed;
   top: 0;
-  left: var(--sidebar-width);
+  left: var(--current-sidebar-width);
   right: 0;
   height: var(--header-height);
-  background: #2563eb; /* Navbar background: #2563EB */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  background: var(--top-navbar-bg);
+  border-bottom: 1px solid var(--sidebar-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -161,9 +196,9 @@ h1, h2, h3, h4, h5, h6 {
   top: 0;
   left: 0;
   bottom: 0;
-  width: var(--sidebar-width);
-  background: #2563eb; /* Sidebar background: #2563EB */
-  border-right: 1px solid rgba(255, 255, 255, 0.15);
+  width: var(--current-sidebar-width);
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
   display: flex;
   flex-direction: column;
   z-index: 200;
@@ -253,6 +288,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .role-fan { background: rgba(6, 182, 212, 0.15); color: var(--color-cyan); border: 1px solid rgba(6, 182, 212, 0.3); }
+.top-navbar .role-fan {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+[data-theme="dark"] .top-navbar .role-fan {
+  color: var(--color-cyan);
+  background: rgba(6, 182, 212, 0.15);
+  border-color: rgba(6, 182, 212, 0.3);
+}
 .role-staff { background: rgba(245, 158, 11, 0.15); color: var(--color-amber); border: 1px solid rgba(245, 158, 11, 0.3); }
 .role-organizer { background: rgba(168, 85, 247, 0.15); color: var(--color-purple); border: 1px solid rgba(168, 85, 247, 0.3); }
 .role-admin { background: rgba(244, 63, 94, 0.15); color: var(--color-rose); border: 1px solid rgba(244, 63, 94, 0.3); }
@@ -616,3 +661,85 @@ h1, h2, h3, h4, h5, h6 {
     display: block;
   }
 }
+
+/* Collapsible Sidebar Styles */
+.app-container.sidebar-collapsed {
+  --current-sidebar-width: 80px;
+}
+
+.sidebar.collapsed {
+  width: var(--current-sidebar-width);
+}
+
+.sidebar.collapsed .sidebar-logo {
+  justify-content: center;
+  padding: 0;
+}
+
+.sidebar.collapsed .sidebar-logo span {
+  display: none;
+}
+
+.sidebar.collapsed .sidebar-logo button {
+  margin: 0 !important;
+}
+
+.sidebar.collapsed .sidebar-menu {
+  padding: 24px 8px;
+}
+
+.sidebar.collapsed .sidebar-link {
+  justify-content: center;
+  padding: 12px 0;
+}
+
+.sidebar.collapsed .sidebar-link span {
+  display: none;
+}
+
+.sidebar.collapsed .sidebar-link svg {
+  margin-right: 0 !important;
+}
+
+.sidebar.collapsed .sidebar-footer {
+  display: none;
+}
+
+/* Sidebar Toggle Button Styles */
+.collapse-toggle-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.collapse-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+/* Theme Toggle Button Styles */
+.theme-toggle-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.theme-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+

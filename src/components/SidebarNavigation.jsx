@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ShieldAlert, AlertTriangle, X, Menu } from "lucide-react";
+import { ShieldAlert, AlertTriangle, X, Menu, Sun, Moon, ChevronsLeft, ChevronsRight } from "lucide-react";
 
 /**
  * SidebarNavigation component rendering the top navbar header and side navigation.
@@ -14,16 +14,23 @@ import { ShieldAlert, AlertTriangle, X, Menu } from "lucide-react";
  * @param {string} props.userRole - Active user role simulated profile
  * @param {Function} props.getRoleLabel - Label helper mapping role keys to printable text
  * @param {Array} props.navigationItems - List of navigation items with path, name, and icon
+ * @param {string} props.theme - Current data-theme (light or dark)
+ * @param {Function} props.setTheme - Theme setter callback
+ * @param {boolean} props.isSidebarCollapsed - Sidebar width collapse state
+ * @param {Function} props.setIsSidebarCollapsed - Collapse state setter callback
  */
 export function SidebarNavigation({
   mobileMenuOpen,
   setMobileMenuOpen,
   onOpenEmergencyModal,
   evacuationAlarm,
-  isFirebaseActive,
   userRole,
   getRoleLabel,
-  navigationItems
+  navigationItems,
+  theme,
+  setTheme,
+  isSidebarCollapsed,
+  setIsSidebarCollapsed
 }) {
   const location = useLocation();
 
@@ -70,34 +77,32 @@ export function SidebarNavigation({
               EVAC WARNING
             </span>
           )}
-          {!isFirebaseActive && (
-            <span 
-              className="badge-status badge-high" 
-              style={{ 
-                background: "rgba(245, 158, 11, 0.1)", 
-                borderColor: "rgba(245, 158, 11, 0.25)", 
-                color: "var(--color-amber)", 
-                fontSize: "0.75rem",
-                display: "flex",
-                alignItems: "center",
-                gap: "4px",
-                animation: "pulse-border 1.5s infinite alternate"
-              }}
-              title="Running on offline local mock states"
-            >
-              ● OFFLINE (SIMULATOR)
-            </span>
-          )}
           <span className={`role-badge role-${userRole}`}>
             {getRoleLabel()}
           </span>
+          <button 
+            className="theme-toggle-btn"
+            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+            aria-label="Toggle dark/light theme"
+            title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
+          >
+            {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
+          </button>
         </div>
       </header>
 
       {/* Sidebar Navigation */}
-      <aside className={`sidebar ${mobileMenuOpen ? 'mobile-open' : ''}`}>
-        <div className="sidebar-logo">
+      <aside className={`sidebar ${mobileMenuOpen ? 'mobile-open' : ''} ${isSidebarCollapsed ? 'collapsed' : ''}`}>
+        <div className="sidebar-logo" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
           <span>🧞‍♂️ StadiumAssist</span>
+          <button 
+            className="collapse-toggle-btn"
+            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            title={isSidebarCollapsed ? "Expand Menu" : "Collapse Menu"}
+            aria-label="Toggle sidebar collapse width"
+          >
+            {isSidebarCollapsed ? <ChevronsRight size={16} /> : <ChevronsLeft size={16} />}
+          </button>
         </div>
 
         <ul className="sidebar-menu">
@@ -109,6 +114,7 @@ export function SidebarNavigation({
                   to={item.path} 
                   className={`sidebar-link ${isActive ? 'active' : ''}`}
                   onClick={() => setMobileMenuOpen(false)}
+                  title={isSidebarCollapsed ? item.name : ""}
                 >
                   <item.icon />
                   <span>{item.name}</span>

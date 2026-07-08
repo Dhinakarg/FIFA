@@ -55,12 +55,17 @@ export default function NavigationWrapper() {
     triggerEvacuationAlarm, 
     reportIncident, 
     volunteers, 
-    isFirebaseActive,
     addLog 
   } = useAppState();
 
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [appLoaded, setAppLoaded] = React.useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = React.useState(() => {
+    return localStorage.getItem("sidebar-collapsed") === "true";
+  });
+  const [theme, setTheme] = React.useState(() => {
+    return localStorage.getItem("theme") || "light";
+  });
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -68,6 +73,15 @@ export default function NavigationWrapper() {
     }, 1200);
     return () => clearTimeout(timer);
   }, []);
+
+  React.useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  React.useEffect(() => {
+    localStorage.setItem("sidebar-collapsed", isSidebarCollapsed);
+  }, [isSidebarCollapsed]);
 
   const getRoleLabel = () => {
     switch (userRole) {
@@ -126,7 +140,7 @@ export default function NavigationWrapper() {
   }
 
   return (
-    <div className="app-container">
+    <div className={`app-container ${isSidebarCollapsed ? "sidebar-collapsed" : ""}`}>
       <div className="bg-ambient-glow" />
 
       <SidebarNavigation
@@ -134,10 +148,13 @@ export default function NavigationWrapper() {
         setMobileMenuOpen={setMobileMenuOpen}
         onOpenEmergencyModal={() => setIsModalOpen(true)}
         evacuationAlarm={evacuationAlarm}
-        isFirebaseActive={isFirebaseActive}
         userRole={userRole}
         getRoleLabel={getRoleLabel}
         navigationItems={navigationItems}
+        theme={theme}
+        setTheme={setTheme}
+        isSidebarCollapsed={isSidebarCollapsed}
+        setIsSidebarCollapsed={setIsSidebarCollapsed}
       />
 
       <main className="main-content">
