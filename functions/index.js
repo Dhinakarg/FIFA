@@ -5,7 +5,7 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 admin.initializeApp();
 
 // 1. predictQueueTimes: HTTP Callable function to predict queue wait times
-exports.predictQueueTimes = functions.https.onCall(async (data, context) => {
+exports.predictQueueTimes = functions.https.onCall(async (data, _context) => {
   const gateId = data.gateId || "gate-a";
   const currentCount = data.currentCount || 150;
   const processingRate = data.processingRate || 10; // fans processed per minute
@@ -55,7 +55,7 @@ exports.onIncidentReported = functions.firestore
   });
 
 // 3. generateStadiumReport: HTTPS callable to generate operational briefings via Gemini (DSS Support)
-exports.generateStadiumReport = functions.https.onCall(async (data, context) => {
+exports.generateStadiumReport = functions.https.onCall(async (data, _context) => {
   const crowd = data.crowd || { attendance: 41000, capacity: 50000 };
   const incidents = data.incidents || [];
   const gates = data.gates || [];
@@ -114,7 +114,7 @@ Provide a concise, professional operational briefing (maximum 4 sentences) for t
 
 
 // 4. translateResponse: HTTPS callable to translate answers via Gemini
-exports.translateResponse = functions.https.onCall(async (data, context) => {
+exports.translateResponse = functions.https.onCall(async (data, _context) => {
   const text = data.text;
   const targetLanguage = data.targetLanguage || "es";
 
@@ -197,7 +197,7 @@ function checkRateLimit(identifier, maxRequests = 5, windowMs = 60000) {
  * @returns {Promise<Object>} Object containing the response text
  * @throws {functions.https.HttpsError} If data query is missing or empty
  */
-exports.askGenie = functions.https.onCall(async (data, context) => {
+exports.askGenie = functions.https.onCall(async (data, _context) => {
   const queryText = data.query;
 
   if (!queryText) {
@@ -285,7 +285,7 @@ User Query: "${queryText}"`;
 });
 
 // 6. generateGateSummary: HTTPS callable to generate operational advisory when 2+ gates are congested
-exports.generateGateSummary = functions.https.onCall(async (data, context) => {
+exports.generateGateSummary = functions.https.onCall(async (data, _context) => {
   const gates = data.gates;
 
   if (!gates || !Array.isArray(gates)) {
@@ -333,7 +333,7 @@ Provide a concise, professional operational advisory summary (maximum 3 sentence
 });
 
 // 7. generateTacticalDispatch: HTTPS callable to analyze multiple incidents or unstructured reports via Gemini
-exports.generateTacticalDispatch = functions.https.onCall(async (data, context) => {
+exports.generateTacticalDispatch = functions.https.onCall(async (data, _context) => {
   const activeIncidents = data.activeIncidents || [];
   const unstructuredText = data.unstructuredText || "";
 
@@ -395,7 +395,7 @@ Do not write any greeting or meta-explanation. Return ONLY the raw analysis text
 });
 
 // 8. classifyEmergency: HTTPS callable to classify unstructured emergency reports into predefined types via Gemini
-exports.classifyEmergency = functions.https.onCall(async (data, context) => {
+exports.classifyEmergency = functions.https.onCall(async (data, _context) => {
   const description = data.description;
 
   if (!description) {
@@ -449,7 +449,7 @@ Report: "${description}"`;
 });
 
 // 9. summarizeFeedback: HTTPS callable to summarize guest reviews/comments in Firestore via Gemini
-exports.summarizeFeedback = functions.https.onCall(async (data, context) => {
+exports.summarizeFeedback = functions.https.onCall(async (_data, _context) => {
   const feedbacks = [];
   try {
     const snapshot = await admin.firestore().collection("feedback").get();
@@ -522,6 +522,7 @@ Do not add any greeting or meta-explanation, return ONLY the raw analysis report
     };
   }
 });
+
 
 
 

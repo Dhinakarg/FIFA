@@ -1,3 +1,4 @@
+/* eslint-disable react/only-export-components */
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { isFirebaseSupported, db, auth } from "../firebase";
 import { useFirestoreCollection } from "../hooks/useFirestoreCollection";
@@ -19,117 +20,11 @@ import {
   signOut, 
   onAuthStateChanged 
 } from "firebase/auth";
-
-const initialMockIncidents = [
-  {
-    id: "inc-1",
-    title: "Soda Spill Zone B",
-    description: "Large soda spill near Seat Row 12, sticky hazard.",
-    type: "maintenance",
-    location: "Zone B (Concourse)",
-    status: "pending",
-    reportedBy: "Fan Anonymous",
-    createdAt: new Date(Date.now() - 1000 * 60 * 20).toISOString()
-  },
-  {
-    id: "inc-2",
-    title: "Blocked Exit Gate 3",
-    description: "Discarded merchandise boxes blocking egress corridor.",
-    type: "security",
-    location: "Gate 3 Entrance",
-    status: "in-progress",
-    reportedBy: "Staff Member",
-    createdAt: new Date(Date.now() - 1000 * 60 * 45).toISOString()
-  },
-  {
-    id: "inc-3",
-    title: "Medical Assist Zone E",
-    description: "Elderly fan feeling dizzy, requesting water & checkup.",
-    type: "medical",
-    location: "Zone E Row 4",
-    status: "resolved",
-    reportedBy: "Fan Seat 442",
-    createdAt: new Date(Date.now() - 1000 * 60 * 120).toISOString()
-  }
-];
-
-const initialMockTasks = [
-  {
-    id: "task-1",
-    title: "Check ticket scanner readers - Gate A",
-    description: "Reports of slow RFID scan responses at lanes 3 & 4.",
-    assignedRole: "maintenance",
-    status: "pending",
-    createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString()
-  },
-  {
-    id: "task-2",
-    title: "Deploy wet floor sign Zone B",
-    description: "Associated with soda soda spill incident inc-1.",
-    assignedRole: "maintenance",
-    status: "pending",
-    createdAt: new Date(Date.now() - 1000 * 60 * 18).toISOString()
-  },
-  {
-    id: "task-3",
-    title: "Inspect Gate 3 corridor blockage",
-    description: "Dispatch security to clear vendor boxes from exit path.",
-    assignedRole: "security",
-    status: "in-progress",
-    createdAt: new Date(Date.now() - 1000 * 60 * 40).toISOString()
-  }
-];
-
-const initialMockQueues = [
-  { id: "gate-a", name: "Main Gate A", type: "gate", waitTime: 8, capacity: 35, status: "low" },
-  { id: "gate-b", name: "North Gate B", type: "gate", waitTime: 42, capacity: 92, status: "high" },
-  { id: "gate-c", name: "South Gate C", type: "gate", waitTime: 18, capacity: 55, status: "medium" },
-  { id: "con-east", name: "Eastern Grill Concession", type: "concession", waitTime: 12, capacity: 40, status: "low" },
-  { id: "con-west", name: "Arena Drinks & Snacks", type: "concession", waitTime: 28, capacity: 78, status: "high" },
-  { id: "wc-north", name: "North Plaza Washrooms", type: "concession", waitTime: 4, capacity: 20, status: "low" }
-];
-
-const initialMockGates = [
-  { id: "gate-a", name: "Main Gate A", currentCount: 140, capacity: 1500, status: "Low" },
-  { id: "gate-b", name: "North Gate B", currentCount: 1250, capacity: 1500, status: "High" },
-  { id: "gate-c", name: "South Gate C", currentCount: 680, capacity: 1200, status: "Medium" },
-  { id: "gate-d", name: "East Gate D", currentCount: 95, capacity: 1000, status: "Low" }
-];
-
-const initialMockFeedbacks = [
-  { rating: 5, comment: "Loved the easy parking access at Lot Red." },
-  { rating: 2, comment: "Wait times at Eastern Grill concession was 30 minutes! Unacceptable." },
-  { rating: 4, comment: "Staff was friendly, security check at Gate B was slow though." },
-  { rating: 5, comment: "Wi-fi worked great throughout the match." },
-  { rating: 1, comment: "I got lost looking for Section 228. Need better signs." }
-];
-
-const initialMockFaqs = [
-  { id: "faq-1", keyword: "gates open", intent: "gates_schedule", synonyms: ["opening time", "enter"], response: "Stadium gates open 2 hours prior to the event kick-off time. VIP gates open 2.5 hours early.", language: "en", source: "manual", verified: true },
-  { id: "faq-2", keyword: "toilets", intent: "locate_restroom", synonyms: ["restrooms", "bathrooms", "washrooms", "wc"], response: "Restrooms are located in the concourse near Sections 104, 118, 202, and 228.", language: "en", source: "manual", verified: true },
-  { id: "faq-3", keyword: "food concession", intent: "locate_food", synonyms: ["buy food", "where to eat", "concessions", "drinks"], response: "Eastern Grill, Arena Snacks, and Southern Pizza Hub are open. Check the concessions list on the Map view.", language: "en", source: "manual", verified: true }
-];
-
-const initialMockFacilities = [
-  { id: "fac-1", name: "Eastern Grill Concession", category: "concession", description: "Fresh burgers, fries, draft beers", x: 76, y: 35 },
-  { id: "fac-2", name: "Arena Drinks & Snacks", category: "concession", description: "Popcorn, sodas, nachos, candies", x: 23, y: 35 },
-  { id: "fac-3", name: "Southern Pizza Hub", category: "concession", description: "Personal pizzas, garlic knots", x: 45, y: 88 },
-  { id: "fac-4", name: "VIP Champagne Bar", category: "concession", description: "Premium liquors, wines, cheese boards", x: 80, y: 15 },
-  { id: "fac-5", name: "North Plaza Washrooms", category: "restroom", description: "High-capacity toilets & family stalls", x: 73, y: 65 },
-  { id: "fac-6", name: "South Concourse restrooms", category: "restroom", description: "Toilets next to Southern Pizza", x: 38, y: 88 },
-  { id: "fac-7", name: "East Upper restrooms", category: "restroom", description: "Toilets near VIP Suites Section", x: 85, y: 25 },
-  { id: "fac-8", name: "First Aid Section 104", category: "medical", description: "Primary medical emergency outpost", x: 18, y: 70 },
-  { id: "fac-9", name: "First Aid Section 228", category: "medical", description: "Secondary paramedic support station", x: 82, y: 70 },
-  { id: "fac-10", name: "Customer Help Hub Center", category: "info", description: "Lost & Found, guidebooks, maps", x: 50, y: 20 }
-];
-
-const initialMockVolunteers = [
-  { id: "vol-1", name: "David Miller", zone: "Zone A", role: "usher", status: "available", contactMethod: "Radio Ch 3 / WhatsApp" },
-  { id: "vol-2", name: "Sarah Connor", zone: "Zone B", role: "medical-responder", status: "busy", contactMethod: "Phone +1555019" },
-  { id: "vol-3", name: "James Carter", zone: "Zone C", role: "security-assistant", status: "available", contactMethod: "Radio Ch 5" },
-  { id: "vol-4", name: "Emma Watson", zone: "Zone D", role: "usher", status: "available", contactMethod: "WhatsApp Only" },
-  { id: "vol-5", name: "Robert Downey", zone: "Zone E", role: "security-assistant", status: "busy", contactMethod: "Radio Ch 12" }
-];
+import { 
+  initialMockIncidents, initialMockTasks, initialMockQueues, 
+  initialMockGates, initialMockFeedbacks, initialMockFaqs, 
+  initialMockFacilities, initialMockVolunteers 
+} from "../data/mockData";
 
 const AppStateContext = createContext();
 
@@ -821,48 +716,13 @@ export const AppStateProvider = ({ children }) => {
     }
   };
 
+  /**
+   * Resets local state back to the canonical mock seed data.
+   * Useful for test environment resets and demo resets.
+   */
   const seedTestData = () => {
-    setIncidents([
-      {
-        id: "inc-1",
-        title: "Soda Spill Zone B",
-        description: "Large soda spill near Seat Row 12, sticky hazard.",
-        type: "maintenance",
-        location: "Zone B (Concourse)",
-        status: "pending",
-        reportedBy: "Fan Anonymous",
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: "inc-2",
-        title: "Blocked Exit Gate 3",
-        description: "Discarded merchandise boxes blocking egress corridor.",
-        type: "security",
-        location: "Gate 3 Entrance",
-        status: "in-progress",
-        reportedBy: "Staff Member",
-        createdAt: new Date().toISOString()
-      }
-    ]);
-
-    setTasks([
-      {
-        id: "task-1",
-        title: "Check ticket scanner readers - Gate A",
-        description: "Reports of slow RFID scan responses at lanes 3 & 4.",
-        assignedRole: "maintenance",
-        status: "pending",
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: "task-2",
-        title: "Deploy wet floor sign Zone B",
-        description: "Associated with soda spill incident inc-1.",
-        assignedRole: "maintenance",
-        status: "pending",
-        createdAt: new Date().toISOString()
-      }
-    ]);
+    setIncidents(initialMockIncidents.map(i => ({ ...i, createdAt: new Date().toISOString() })));
+    setTasks(initialMockTasks.map(t => ({ ...t, createdAt: new Date().toISOString() })));
     addLog("Database reset and seeded with standard test datasets.");
   };
 

@@ -193,12 +193,6 @@ function CrowdDashboard() {
         </div>
       </div>
       
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}} />
     </div>
   );
 }
@@ -209,7 +203,6 @@ const styles = {
   advisoryCard: { padding: "24px", marginBottom: "30px", border: "1px solid rgba(168, 85, 247, 0.4)", background: "rgba(168, 85, 247, 0.05)", boxShadow: "0 0 25px rgba(168, 85, 247, 0.15)", animation: "pulse-border 2s infinite alternate" },
   advisoryTitle: { color: "var(--color-purple)", display: "flex", alignItems: "center", gap: "8px", fontWeight: 700, fontSize: "1.1rem" },
   loadingBox: { color: "var(--text-secondary)", fontSize: "0.9rem", display: "flex", alignItems: "center", gap: "10px" },
-  spin: { animation: "spin 1s linear infinite" },
   advisoryText: { color: "var(--text-primary)", fontSize: "0.95rem", lineHeight: "1.6" }
 };
 

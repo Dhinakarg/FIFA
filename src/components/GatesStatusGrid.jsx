@@ -44,6 +44,7 @@ export function GatesStatusGrid({ gateStates, onToggleGate, isAuthorized }) {
                 className={`interactive-btn ${isClosed ? 'success' : 'danger'}`}
                 style={{ width: "100%", padding: "8px", fontSize: "0.8rem", borderRadius: "8px" }}
                 disabled={!isAuthorized}
+                aria-label={`${isClosed ? 'Unlock' : 'Lock'} turnstiles for ${gateName}`}
               >
                 {isClosed ? "Unlock Turnstiles" : "Lock Turnstiles"}
               </button>

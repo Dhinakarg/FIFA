@@ -6,14 +6,9 @@ import StatCard from "../components/StatCard";
 import { ActiveSopOverlay } from "../components/ActiveSopOverlay";
 import { IncidentQueue } from "../components/IncidentQueue";
 import { TaskDispatchList } from "../components/TaskDispatchList";
+import { predefinedSOPs } from "../data/mockData";
 
-const predefinedSOPs = {
-  "fire": "🚨 SOP-FIRE:\n1. Alert fire marshall & call Fire Dispatch immediately.\n2. Engage local alarm pulls and trigger PA evacuation broadcast.\n3. Instruct stewards to open all Gates and clear exit egress paths.\n4. Deploy fire extinguishers only for minor localized hotspots.",
-  "medical": "✙ SOP-MEDICAL:\n1. Dispatch closest zone first-aid responder with AED.\n2. Clear aisle space for paramedics stretchers.\n3. Monitor patient vital signs until ambulance crew arrives.\n4. Record incident details in medical logs.",
-  "lost child": "👦 SOP-LOST-CHILD:\n1. Distribute description to all perimeter gate ushers immediately.\n2. Monitor exit CCTV cameras and freeze turnstiles egress.\n3. Guide guardian to Customer Help Hub (Section 101) to announce child name.",
-  "fight": "👊 SOP-CROWD-FIGHT:\n1. Dispatch Zone Security squad (minimum 3 officers).\n2. Stewards must maintain distance and observe details (film on phones if possible).\n3. Alert local police dispatcher for fast-track arrest assistance.",
-  "power failure": "🔌 SOP-POWER-FAILURE:\n1. Verify backup generator engagement (automatic within 10 seconds).\n2. Manually deploy flashlight guards to emergency staircases.\n3. Broadcast reassurance announcement via PA battery system.\n4. Alert main grid contractor."
-};
+
 
 /**
  * StaffOperations page rendering real-time incident queues, SOP guidelines,
@@ -175,18 +170,11 @@ export default function StaffOperations() {
         <TaskDispatchList isAuthorized={isAuthorized} reportIncident={reportIncident} />
       </div>
       
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}} />
     </div>
   );
 }
 
 const styles = {
   geminiCard: { padding: "24px", marginBottom: "30px", border: "1px solid rgba(168, 85, 247, 0.4)", background: "rgba(168, 85, 247, 0.05)", boxShadow: "0 0 25px rgba(168, 85, 247, 0.1)", animation: "pulse-border 2s infinite alternate" },
-  spin: { animation: "spin 1s linear infinite" },
   reportBox: { background: "#080c18", padding: "16px", borderRadius: "10px", border: "1px solid var(--border-glass)", fontSize: "0.9rem", lineHeight: "1.6", color: "var(--text-primary)", whiteSpace: "pre-line" }
 };

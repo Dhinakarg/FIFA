@@ -9,6 +9,7 @@ import StaffOperations from "../pages/StaffOperations";
 import { SidebarNavigation } from "./SidebarNavigation";
 import { EmergencyModal } from "./EmergencyModal";
 import { useEmergencyHandler } from "../hooks/useEmergencyHandler";
+import { predefinedSOPs } from "../data/mockData";
 import { 
   Home as HomeIcon, 
   MessageSquare, 
@@ -33,13 +34,6 @@ const navigationItems = [
   { name: "Admin Panel", path: "/admin", icon: Shield }
 ];
 
-const predefinedSOPs = {
-  "fire": "🚨 SOP-FIRE:\n1. Pull the nearest fire alarm station.\n2. Evacuate the sector immediately.\n3. Call Fire Dispatch.\n4. Guide fans to Gate A & D exits.",
-  "medical": "✙ SOP-MEDICAL:\n1. Deploy the nearest zone first aider with AED.\n2. Clear the aisle for paramedic ingress.\n3. Provide CPR/First Aid if trained.",
-  "lost child": "👦 SOP-LOST-CHILD:\n1. Alert all zone gate ushers.\n2. Lock down exit turnstiles.\n3. Escort parent to Customer Help Hub Section 101.\n4. Initiate child description broadcast.",
-  "fight": "👊 SOP-CROWD-FIGHT:\n1. Dispatch Zone Security squad.\n2. Avoid physical intervention until squad arrives.\n3. Monitor via CCTV Section.\n4. Alert local police unit.",
-  "power failure": "🔌 SOP-POWER-FAILURE:\n1. Activate backup generators.\n2. Guard gates and emergency exits manually.\n3. Re-establish comms loop.\n4. Advise fans via PA."
-};
 
 /**
  * NavigationWrapper layout shell manager.
@@ -208,12 +202,6 @@ export default function NavigationWrapper() {
         onClose={closeEmergencyModal}
       />
       
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}} />
     </div>
   );
 }

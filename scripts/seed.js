@@ -11,7 +11,7 @@ if (process.env.FIRESTORE_EMULATOR_HOST) {
       credential: admin.credential.cert(serviceAccount)
     });
     console.log("Connected using service-account.json credential.");
-  } catch (e) {
+  } catch {
     console.log("Service account file not found. Falling back to default emulator project id 'stadiumgenie-demo'.");
     // This allows seamless seeding of the emulator even if variables aren't preset
     admin.initializeApp({ projectId: "stadiumgenie-demo" });

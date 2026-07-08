@@ -118,7 +118,7 @@ export default function OrganizerDashboard() {
           <button onClick={handleGenerateBriefing} className="interactive-btn" style={styles.briefingBtn} disabled={dssLoading}>
             {dssLoading ? (
               <>
-                <Loader2 size={16} className="animate-spin" style={{ marginRight: "8px", animation: "spin 1s linear infinite" }} />
+                <Loader2 size={16} className="animate-spin" style={{ marginRight: "8px" }} />
                 Synthesizing Telemetry...
               </>
             ) : (
@@ -149,7 +149,7 @@ export default function OrganizerDashboard() {
           <button onClick={handleGenerateFeedbackSummary} className="interactive-btn" style={styles.feedbackBtn} disabled={fbLoading}>
             {fbLoading ? (
               <>
-                <Loader2 size={16} className="animate-spin" style={{ marginRight: "8px", animation: "spin 1s linear infinite" }} />
+                <Loader2 size={16} className="animate-spin" style={{ marginRight: "8px" }} />
                 Aggregating Reviews...
               </>
             ) : (
@@ -171,12 +171,6 @@ export default function OrganizerDashboard() {
 
       <GatesStatusGrid gateStates={gateStates} onToggleGate={handleToggleGate} isAuthorized={isAuthorized} />
       
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}} />
     </div>
   );
 }

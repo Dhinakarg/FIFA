@@ -743,3 +743,20 @@ h1, h2, h3, h4, h5, h6 {
   transform: scale(1.05);
 }
 
+/* =========================================
+   Global Animation Keyframes
+   ========================================= */
+@keyframes spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes spin-reverse {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+

@@ -212,8 +212,8 @@ export function VolunteerSimulator({
                     <td><span className={`badge-status badge-${gate.status.toLowerCase()}`}>{gate.status}</span></td>
                     <td>
                       <div style={{ display: "flex", gap: "6px" }}>
-                        <button onClick={() => { setEditingGate(gate); setGateName(gate.name); setGateCount(gate.currentCount); setGateCapacity(gate.capacity); setGateStatus(gate.status); }} className="interactive-btn secondary" style={{ padding: "4px 8px" }} disabled={!isAuthorized}><Edit size={12} /></button>
-                        <button onClick={() => deleteGate(gate.id)} className="interactive-btn secondary" style={{ padding: "4px 8px", color: "var(--color-rose)" }} disabled={!isAuthorized}><Trash2 size={12} /></button>
+                        <button onClick={() => { setEditingGate(gate); setGateName(gate.name); setGateCount(gate.currentCount); setGateCapacity(gate.capacity); setGateStatus(gate.status); }} className="interactive-btn secondary" style={{ padding: "4px 8px" }} disabled={!isAuthorized} aria-label={`Edit gate ${gate.name}`}><Edit size={12} /></button>
+                        <button onClick={() => deleteGate(gate.id)} className="interactive-btn secondary" style={{ padding: "4px 8px", color: "var(--color-rose)" }} disabled={!isAuthorized} aria-label={`Delete gate ${gate.name}`}><Trash2 size={12} /></button>
                       </div>
                     </td>
                   </tr>
@@ -254,8 +254,8 @@ export function VolunteerSimulator({
                     <td>({fac.x}%, {fac.y}%)</td>
                     <td>
                       <div style={{ display: "flex", gap: "6px" }}>
-                        <button onClick={() => { setEditingFacility(fac); setFacName(fac.name); setFacCategory(fac.category); setFacDesc(fac.description); setFacX(fac.x); setFacY(fac.y); }} className="interactive-btn secondary" style={{ padding: "4px 8px" }} disabled={!isAuthorized}><Edit size={12} /></button>
-                        <button onClick={() => deleteFacility(fac.id)} className="interactive-btn secondary" style={{ padding: "4px 8px", color: "var(--color-rose)" }} disabled={!isAuthorized}><Trash2 size={12} /></button>
+                        <button onClick={() => { setEditingFacility(fac); setFacName(fac.name); setFacCategory(fac.category); setFacDesc(fac.description); setFacX(fac.x); setFacY(fac.y); }} className="interactive-btn secondary" style={{ padding: "4px 8px" }} disabled={!isAuthorized} aria-label={`Edit facility ${fac.name}`}><Edit size={12} /></button>
+                        <button onClick={() => deleteFacility(fac.id)} className="interactive-btn secondary" style={{ padding: "4px 8px", color: "var(--color-rose)" }} disabled={!isAuthorized} aria-label={`Delete facility ${fac.name}`}><Trash2 size={12} /></button>
                       </div>
                     </td>
                   </tr>
