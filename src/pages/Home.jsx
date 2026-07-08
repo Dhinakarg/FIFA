@@ -10,8 +10,7 @@ function Home() {
     incidents, 
     tasks, 
     queues, 
-    evacuationAlarm,
-    isFirebaseActive 
+    evacuationAlarm
   } = useAppState();
 
   const pendingIncidentsCount = useMemo(() => incidents.filter(i => i.status !== "resolved").length, [incidents]);
@@ -41,9 +40,6 @@ function Home() {
           <p className="page-description">Real-time stadium telemetry and crowd coordination control center.</p>
         </div>
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-          <span className={`badge-status ${isFirebaseActive ? 'role-fan' : 'role-staff'}`}>
-            {isFirebaseActive ? "Firestore Connected" : "Local Simulation Mode"}
-          </span>
           {evacuationAlarm && (
             <span className="badge-status badge-high" style={{ padding: "8px 12px", animation: "pulse-border 1s infinite alternate" }}>
               ⚠️ ACTIVE EVACUATION
