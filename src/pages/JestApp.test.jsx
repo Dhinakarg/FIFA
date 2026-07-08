@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { AppStateProvider } from '../context/AppStateContext';
 import FanAssistant from './FanAssistant';
@@ -66,13 +66,13 @@ describe('StadiumAssist Jest Test Suite', () => {
       
       await act(async () => {
         fireEvent.click(sendButton);
-        // Wait for connection fallback loose matching to resolve (wrapped in a timeout)
-        await new Promise((r) => setTimeout(r, 1200));
       });
 
       // Verification: Fallback string containing verified FAQ contents is rendered
-      expect(screen.getByText(/Connection Fallback/i)).toBeInTheDocument();
-      expect(screen.getByText(/Eastern Grill, Arena Snacks, and Southern Pizza Hub are open/i)).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText(/Connection Fallback/i)).toBeInTheDocument();
+        expect(screen.getByText(/Eastern Grill, Arena Snacks, and Southern Pizza Hub are open/i)).toBeInTheDocument();
+      }, { timeout: 3000 });
     });
 
     it('returns generic Customer Help Hub fallback if no loose matches are found', async () => {
@@ -89,14 +89,40 @@ describe('StadiumAssist Jest Test Suite', () => {
       
       await act(async () => {
         fireEvent.click(sendButton);
-        await new Promise((r) => setTimeout(r, 1200));
       });
 
       // Verification: Generic fallback notice is rendered
-      expect(screen.getByText(/We are experiencing connection issues reaching our AI assistant/i)).toBeInTheDocument();
-      expect(screen.getByText(/visit the closest Customer Help Hub located at Section 101/i)).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText(/We are experiencing connection issues reaching our AI assistant/i)).toBeInTheDocument();
+        expect(screen.getByText(/visit the closest Customer Help Hub located at Section 101/i)).toBeInTheDocument();
+      }, { timeout: 3000 });
+    });
+
+    it('correctly queries Gemini via askGenieCallable for unknown queries', async () => {
+      const { askGenieCallable } = require('../firebase');
+      askGenieCallable.mockResolvedValueOnce({
+        data: { response: "Gemini response for an unknown query." }
+      });
+
+      renderWithProviders(<FanAssistant />);
+
+      const input = screen.getByLabelText(/Chat input query/i);
+      const sendButton = screen.getByLabelText(/Send message/i);
+
+      // Query has no FAQ matches
+      fireEvent.change(input, { target: { value: 'What is the stadium weather policy?' } });
+      
+      await act(async () => {
+        fireEvent.click(sendButton);
+      });
+
+      await waitFor(() => {
+        expect(askGenieCallable).toHaveBeenCalledWith({ query: 'What is the stadium weather policy?' });
+        expect(screen.getByText("Gemini response for an unknown query.")).toBeInTheDocument();
+      });
     });
   });
+
 
   describe('2. StadiumMap SVG Pathfinding Bezier Calculation', () => {
     it('generates a valid Bezier path string from gate to concession', () => {
@@ -155,5 +181,138 @@ describe('StadiumAssist Jest Test Suite', () => {
       // FAQ form is enabled
       expect(faqInput).not.toBeDisabled();
     });
+
+    it('blocks Fan-role user from triggering write submit actions on the forms', () => {
+      renderWithProviders(<AdminPanel />);
+      
+      // Submit button should be disabled for Fans
+      const createEntryBtn = screen.getByRole('button', { name: /Create Entry/i });
+      expect(createEntryBtn).toBeDisabled();
+
+      // Edit/Delete buttons on the first FAQ row should be disabled
+      const editButtons = screen.getAllByLabelText(/Edit FAQ for/i);
+      expect(editButtons[0]).toBeDisabled();
+
+      const deleteButtons = screen.getAllByLabelText(/Delete FAQ for/i);
+      expect(deleteButtons[0]).toBeDisabled();
+    });
+  });
+
+
+  describe('5. Multi-Language Translation End-to-End Selector', () => {
+    it('triggers translateResponseCallable when non-English languages are selected', async () => {
+      const { translateResponseCallable, askGenieCallable } = require('../firebase');
+      
+      // Setup mocked responses
+      askGenieCallable.mockResolvedValue({
+        data: { response: "Mock English response from Gemini AI." }
+      });
+      translateResponseCallable
+        .mockResolvedValueOnce({ data: { translatedText: "Este es un mensaje traducido al español." } })
+        .mockResolvedValueOnce({ data: { translatedText: "Ceci est un message traduit en français." } });
+
+      renderWithProviders(<FanAssistant />);
+
+      const langSelect = screen.getByLabelText(/Language:/i);
+      const input = screen.getByLabelText(/Chat input query/i);
+      const sendButton = screen.getByLabelText(/Send message/i);
+
+      // --- Test 1: Spanish (es) ---
+      fireEvent.change(langSelect, { target: { value: 'es' } });
+      fireEvent.change(input, { target: { value: 'Where is gate B?' } });
+      
+      await act(async () => {
+        fireEvent.click(sendButton);
+      });
+
+      await waitFor(() => {
+        expect(translateResponseCallable).toHaveBeenCalledWith({
+          text: "Mock English response from Gemini AI.",
+          targetLanguage: "es"
+        });
+        expect(screen.getByText("Este es un mensaje traducido al español.")).toBeInTheDocument();
+      });
+
+      // --- Test 2: French (fr) ---
+      fireEvent.change(langSelect, { target: { value: 'fr' } });
+      fireEvent.change(input, { target: { value: 'Where is the food court?' } });
+
+      await act(async () => {
+        fireEvent.click(sendButton);
+      });
+
+      await waitFor(() => {
+        expect(translateResponseCallable).toHaveBeenCalledWith({
+          text: "Mock English response from Gemini AI.",
+          targetLanguage: "fr"
+        });
+        expect(screen.getByText("Ceci est un message traduit en français.")).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('6. Congestion Gemini Summary Constraints', () => {
+    it('does not trigger Gemini summary when only 1 gate exceeds 80% occupancy', async () => {
+      const { generateGateSummaryCallable } = require('../firebase');
+      
+      const AppStateContext = require('../context/AppStateContext');
+      
+      // Mock gates: only Gate B is congested (850/1000 = 85%), others are low
+      const mockGatesSingleCongested = [
+        { id: "gate-a", name: "Main Gate A", currentCount: 100, capacity: 1000, status: "Low" },
+        { id: "gate-b", name: "North Gate B", currentCount: 850, capacity: 1000, status: "High" },
+        { id: "gate-c", name: "South Gate C", currentCount: 200, capacity: 1000, status: "Low" },
+        { id: "gate-d", name: "East Gate D", currentCount: 100, capacity: 1000, status: "Low" }
+      ];
+
+      jest.spyOn(AppStateContext, 'useAppState').mockImplementation(() => ({
+        gates: mockGatesSingleCongested,
+        evacuationAlarm: false,
+        activeEvent: { attendance: 41250, capacity: 50000 },
+        addLog: jest.fn()
+      }));
+
+      renderWithProviders(<CrowdDashboard />);
+
+      // Verify generateGateSummaryCallable is NOT called
+      expect(generateGateSummaryCallable).not.toHaveBeenCalled();
+
+      AppStateContext.useAppState.mockRestore();
+    });
+
+    it('triggers Gemini summary when 2 or more gates exceed 80% occupancy simultaneously', async () => {
+      const { generateGateSummaryCallable } = require('../firebase');
+      generateGateSummaryCallable.mockResolvedValueOnce({
+        data: { summary: "Mocked Gemini Summary: Gate B and Gate C are congested." }
+      });
+      
+      const AppStateContext = require('../context/AppStateContext');
+      
+      // Mock gates: Gate B (850/1000 = 85%) and Gate C (900/1000 = 90%) are congested
+      const mockGatesDoubleCongested = [
+        { id: "gate-a", name: "Main Gate A", currentCount: 100, capacity: 1000, status: "Low" },
+        { id: "gate-b", name: "North Gate B", currentCount: 850, capacity: 1000, status: "High" },
+        { id: "gate-c", name: "South Gate C", currentCount: 900, capacity: 1000, status: "High" },
+        { id: "gate-d", name: "East Gate D", currentCount: 100, capacity: 1000, status: "Low" }
+      ];
+
+      jest.spyOn(AppStateContext, 'useAppState').mockImplementation(() => ({
+        gates: mockGatesDoubleCongested,
+        evacuationAlarm: false,
+        activeEvent: { attendance: 41250, capacity: 50000 },
+        addLog: jest.fn()
+      }));
+
+      renderWithProviders(<CrowdDashboard />);
+
+      // Verify generateGateSummaryCallable IS called
+      await waitFor(() => {
+        expect(generateGateSummaryCallable).toHaveBeenCalled();
+        expect(screen.getByText(/Mocked Gemini Summary: Gate B and Gate C are congested./i)).toBeInTheDocument();
+      });
+
+      AppStateContext.useAppState.mockRestore();
+    });
   });
 });
+

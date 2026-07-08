@@ -160,12 +160,57 @@ exports.translateResponse = functions.https.onCall(async (data, context) => {
   }
 });
 
-// 5. askGenie: HTTPS callable to answer unknown queries via Gemini and write back to Firestore
+// Simple in-memory sliding window rate limiter state for askGenie
+const askGenieRateLimits = {};
+
+/**
+ * Checks request rate limit constraints for a specific client identifier.
+ * 
+ * @param {string} identifier - Unique client identifier (UID or IP address)
+ * @param {number} maxRequests - Maximum requests allowed in the window
+ * @param {number} windowMs - Time window in milliseconds
+ * @returns {boolean} True if within limits, False if rate limit exceeded
+ */
+function checkRateLimit(identifier, maxRequests = 5, windowMs = 60000) {
+  const now = Date.now();
+  if (!askGenieRateLimits[identifier]) {
+    askGenieRateLimits[identifier] = [];
+  }
+  askGenieRateLimits[identifier] = askGenieRateLimits[identifier].filter(
+    timestamp => now - timestamp < windowMs
+  );
+  if (askGenieRateLimits[identifier].length >= maxRequests) {
+    return false;
+  }
+  askGenieRateLimits[identifier].push(now);
+  return true;
+}
+
+/**
+ * Cloud Function - HTTPS Callable (askGenie)
+ * Processes fan queries via the Google Gemini generative model, falling back to a structured 
+ * local simulation response if the API key is not configured.
+ * 
+ * @param {Object} data - Parameters sent from the client
+ * @param {string} data.query - Input question or request string from the user
+ * @param {Object} context - Callable context parameters (auth, token details)
+ * @returns {Promise<Object>} Object containing the response text
+ * @throws {functions.https.HttpsError} If data query is missing or empty
+ */
 exports.askGenie = functions.https.onCall(async (data, context) => {
   const queryText = data.query;
 
   if (!queryText) {
     throw new functions.https.HttpsError("invalid-argument", "Query must be provided.");
+  }
+
+  // Rate Limiting: Max 5 requests per minute
+  const identifier = (context.auth && context.auth.uid) || (context.rawRequest && context.rawRequest.ip) || "anonymous";
+  if (!checkRateLimit(identifier, 5, 60000)) {
+    throw new functions.https.HttpsError(
+      "resource-exhausted",
+      "Too many requests. Please wait a minute before querying Genie again."
+    );
   }
 
   const apiKey = process.env.GEMINI_API_KEY;

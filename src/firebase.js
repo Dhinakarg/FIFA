@@ -28,6 +28,12 @@ let db = null;
 let auth = null;
 let functions = null;
 let isFirebaseSupported = false;
+/**
+ * HTTPS Callable Cloud Function wrapper to invoke askGenie on Firebase.
+ * Matches user query against Google Gemini AI model and local parameters.
+ * 
+ * @type {Function|null}
+ */
 let askGenieCallable = null;
 let translateResponseCallable = null;
 let generateGateSummaryCallable = null;

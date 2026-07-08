@@ -105,3 +105,17 @@ Our testing strategy leverages **Jest** and **React Testing Library** to establi
 - **Gate Congestion Engine (suggestAlternateGate)**: Validates that when a gate exceeds the critical 80% occupancy limit, the rule engine sorts and recommends the safest gate with the lowest load ratio.
 - **RBAC Role Gating**: Asserts that active user roles dynamically gate administrative panels, showing read-only warnings and blocking CRUD forms for regular fans, while enabling all controls for admins.
 
+---
+
+## 🎯 Problem Statement Alignment
+
+This platform is architected to address the four required tracks of the smart stadium challenge:
+
+| Track Required | Specific App Feature | Technical Implementation |
+|---|---|---|
+| **1. Dynamic Crowd Management** | [CrowdDashboard](file:///D:/dinak/FIFA/src/pages/CrowdDashboard.jsx) & [GatesStatsTable](file:///D:/dinak/FIFA/src/components/GatesStatsTable.jsx) | Tracks real-time gate occupancy load ratios. When any ingress turnstile exceeds **80% capacity**, the system sounds congestion alerts and triggers the alternate routing engine, dynamically sorting and recommending the gate with the lowest queue load to distribute crowd ingress. |
+| **2. Smart Indoor Navigation** | [StadiumMap](file:///D:/dinak/FIFA/src/pages/StadiumMap.jsx) & [StadiumSvg](file:///D:/dinak/FIFA/src/components/StadiumSvg.jsx) | Renders a custom vector SVG layout. Implements a pathfinding algorithm (`getPathDAttribute`) that calculates smooth, curved Bezier egress paths hugging the concourses and avoiding the central seating bowl, alongside a zone lookup showing active nearby support volunteers. |
+| **3. Real-Time Decision Support** | [OrganizerDashboard](file:///D:/dinak/FIFA/src/pages/OrganizerDashboard.jsx) & [StaffOperations](file:///D:/dinak/FIFA/src/pages/StaffOperations.jsx) | Integrates Gemini-powered Decision Support Systems (DSS). Features automatic briefing summaries, unstructured emergency incident classification (`classifyEmergency`), and automated task-generation mapping to emergency SOP response checklists. |
+| **4. Multi-Language Assistance** | [FanAssistant](file:///D:/dinak/FIFA/src/pages/FanAssistant.jsx) & [ChatbotPanel](file:///D:/dinak/FIFA/src/components/ChatbotPanel.jsx) | Combines rule-based synonym search caching with Gemini `askGenie` Cloud Functions. Supports a language selection widget that translates responses end-to-end to targets like Spanish (es), French (fr), German (de), and Italian (it) via Firebase Callable functions. |
+
+

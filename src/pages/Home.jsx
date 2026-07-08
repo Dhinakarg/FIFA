@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useAppState } from "../context/AppStateContext";
 import StatCard from "../components/StatCard";
 import { Users, AlertTriangle, CheckSquare, Shield, Activity, Clock, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
-export default function Home() {
+function Home() {
   const { 
     activeEvent, 
     incidents, 
@@ -14,16 +14,24 @@ export default function Home() {
     isFirebaseActive 
   } = useAppState();
 
-  const pendingIncidentsCount = incidents.filter(i => i.status !== "resolved").length;
-  const pendingTasksCount = tasks.filter(t => t.status !== "completed").length;
+  const pendingIncidentsCount = useMemo(() => incidents.filter(i => i.status !== "resolved").length, [incidents]);
+  const pendingTasksCount = useMemo(() => tasks.filter(t => t.status !== "completed").length, [tasks]);
 
   // Find fastest & slowest gate
-  const gateQueues = queues.filter(q => q.type === "gate");
-  const sortedGates = [...gateQueues].sort((a, b) => a.waitTime - b.waitTime);
-  const fastestGate = sortedGates[0];
-  const slowestGate = sortedGates[sortedGates.length - 1];
+  const gateQueues = useMemo(() => queues.filter(q => q.type === "gate"), [queues]);
+  const { fastestGate, slowestGate, averageWaitTime } = useMemo(() => {
+    const sorted = [...gateQueues].sort((a, b) => a.waitTime - b.waitTime);
+    const avg = gateQueues.length > 0
+      ? Math.round(gateQueues.reduce((acc, curr) => acc + curr.waitTime, 0) / gateQueues.length)
+      : 0;
+    return {
+      fastestGate: sorted[0],
+      slowestGate: sorted[sorted.length - 1],
+      averageWaitTime: avg
+    };
+  }, [gateQueues]);
 
-  const occupancyPercent = Math.round((activeEvent.attendance / activeEvent.capacity) * 100);
+  const occupancyPercent = useMemo(() => Math.round((activeEvent.attendance / activeEvent.capacity) * 100), [activeEvent]);
 
   return (
     <div>
@@ -100,7 +108,7 @@ export default function Home() {
             <div>
               <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", textTransform: "uppercase" }}>Average Entry Wait</div>
               <div style={{ fontSize: "1.2rem", fontWeight: 700, color: "var(--color-cyan)", marginTop: "4px" }}>
-                {Math.round(gateQueues.reduce((acc, curr) => acc + curr.waitTime, 0) / gateQueues.length)} mins
+                {averageWaitTime} mins
               </div>
             </div>
             <div>
@@ -194,3 +202,5 @@ export default function Home() {
     </div>
   );
 }
+
+export default React.memo(Home);
